@@ -131,8 +131,8 @@ public class RobotContainer {
     //intake.setDefaultCommand(new StopIntake());
 
     // Choose a default turret command
-    turret.setDefaultCommand(new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));  // use only for matches
-    //turret.setDefaultCommand(new SetTurretPosition(0));  // stop turret when starting 
+    // turret.setDefaultCommand(new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));  // use only for matches
+    turret.setDefaultCommand(new SetTurretPosition(0));  // stop turret when starting 
     //turret.setDefaultCommand(new JoystickTurret());
 
     drivetrain.setDefaultCommand(
