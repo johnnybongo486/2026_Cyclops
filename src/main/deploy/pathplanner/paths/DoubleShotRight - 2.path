@@ -1,0 +1,186 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.91,
+        "y": 0.625
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.909999999999999,
+        "y": 0.625
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.775620279715305,
+        "y": 1.2331311156109792
+      },
+      "prevControl": {
+        "x": 7.784885894989363,
+        "y": 0.46139441194007724
+      },
+      "nextControl": {
+        "x": 7.766237586788533,
+        "y": 2.01461926255977
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.775620279715305,
+        "y": 2.4111982881597713
+      },
+      "prevControl": {
+        "x": 7.77483451602801,
+        "y": 2.035754983669471
+      },
+      "nextControl": {
+        "x": 7.777059302921074,
+        "y": 3.0987734921906247
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.329201141226819,
+        "y": 2.4111982881597713
+      },
+      "prevControl": {
+        "x": 6.314815715906672,
+        "y": 3.0777229946598785
+      },
+      "nextControl": {
+        "x": 6.3439315522070965,
+        "y": 1.7286892460736216
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.825794243514714,
+        "y": 0.625
+      },
+      "prevControl": {
+        "x": 6.685083263762767,
+        "y": 0.6163394111286891
+      },
+      "nextControl": {
+        "x": 5.124492825787154,
+        "y": 0.6320682658694424
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.61,
+        "y": 0.625
+      },
+      "prevControl": {
+        "x": 4.567178094894653,
+        "y": 0.6244698095951022
+      },
+      "nextControl": {
+        "x": 2.6094457831325304,
+        "y": 0.6255542168674699
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 0.5003975903614455,
+        "y": 0.855
+      },
+      "prevControl": {
+        "x": 1.1965680337819833,
+        "y": 0.8549999999999999
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.4273858921161898,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 0.9917012448132503,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 1.9875518672199186,
+      "rotationDegrees": 90.1
+    },
+    {
+      "waypointRelativePos": 3.0082987551867193,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 3.9958506224066337,
+      "rotationDegrees": 180.0
+    },
+    {
+      "waypointRelativePos": 5.024066390041352,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 5.5,
+      "maxWaypointRelativePos": 6.0,
+      "constraints": {
+        "maxVelocity": 5.0,
+        "maxAcceleration": 2.5,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    },
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 0.0,
+      "maxWaypointRelativePos": 4.210169491525406,
+      "constraints": {
+        "maxVelocity": 5.0,
+        "maxAcceleration": 3.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 5.0,
+    "maxAcceleration": 5.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -89.9999999994465
+  },
+  "reversed": false,
+  "folder": "DoubleShotRight",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 165.0
+  },
+  "useDefaultConstraints": false
+}
