@@ -18,8 +18,8 @@ public class AutoAimPose extends Command {
     private boolean isPassingMode = false;
 
     public AutoAimPose() {
-        addRequirements(RobotContainer.turret);
-        ;
+       addRequirements(RobotContainer.turret);
+
     }
 
     public void initialize() {
@@ -81,10 +81,10 @@ public class AutoAimPose extends Command {
         SmartDashboard.putNumber("POINTANGLE", pointAngle);
         
         // Convert Angle to Ticks
-        double targetPosition = pointAngle / 9.2571428;
+        // double targetPosition = pointAngle / 9.2571428;
         
         // Set Target Position
-        RobotContainer.turret.setTargetPosition(targetPosition);
+        RobotContainer.turret.setTargetPosition(0.0);
 
         if(RobotContainer.poseEst.getIsSafe() == true) {
 			RobotContainer.turret.positionControl();

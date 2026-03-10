@@ -3,6 +3,15 @@ package frc.robot.commands.Turret; //holds the code for the command group, says 
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.commands.Swerve.TeleopDrive;
+import frc.robot.subsystems.CommandSwerveDrivetrain;
+
+import java.util.function.DoubleSupplier;
+
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -11,7 +20,11 @@ import edu.wpi.first.wpilibj2.command.Command; //imports establish what will nee
 public class AimToShootPoseOnly extends Command {  //the code within the class AimToShoot decides 
                                             //the numbers necessary to make the robot function as it should
 
+    private SwerveRequest.FieldCentric poseDrive;
+    
     private double tDistance;
+    private final PIDController angleController = new PIDController(0.0065, 0, 0.0001);
+    private double rotationVal;
 
     private double hoodPosition = 0;
     private double shooterSpeed = 0;
@@ -43,27 +56,27 @@ public class AimToShootPoseOnly extends Command {  //the code within the class A
         oldDistance = RobotContainer.poseEst.distanceTarget();
         oldTheta = RobotContainer.poseEst.aimToHub();
         oldThetaPass = RobotContainer.poseEst.aimToPass();
+        angleController.setTolerance(0.05);  // needs to be tuned
 
     }
     
     @Override
     public void execute() {
-        // If we don't see a target, scan
         boolean onTarget = RobotContainer.turret.getOnTarget();
 
         newDistance = RobotContainer.poseEst.distanceTarget();
-        newTheta = RobotContainer.poseEst.aimToHub();
-        newThetaPass = RobotContainer.poseEst.aimToPass();
+        newTheta = RobotContainer.poseEst.aimToHub(); // angle from 0 to the goal
+        newThetaPass = RobotContainer.poseEst.aimToPass(); // angle from 0 to the passing target
 
 
-        deltaDistance = oldDistance - newDistance;
-        double speedD = deltaDistance / 0.02;
+        deltaDistance = oldDistance - newDistance; // change in distance
+        double speedD = deltaDistance / 0.02; // how fast we're moving towards or away
 
-        deltaTheta = newTheta - oldTheta;
-        double speedT = deltaTheta / 0.02;
+        deltaTheta = newTheta - oldTheta; // change in angle to hub
+        double speedT = deltaTheta / 0.02; // rate of theta change to hub
 
-        deltaThetaPass = newThetaPass - oldThetaPass;
-        double speedTP = deltaThetaPass / 0.02;
+        deltaThetaPass = newThetaPass - oldThetaPass; // change in angle to passing target
+        double speedTP = deltaThetaPass / 0.02; // rate of theta change to passing target
 
         currentAngle = RobotContainer.drivetrain.getState().Pose.getRotation().getDegrees();
 
@@ -76,15 +89,15 @@ public class AimToShootPoseOnly extends Command {  //the code within the class A
                 // calculate point angle and target distance
                 if (DriverStation.getAlliance().get() == Alliance.Red) {
                     if (currentAngle > 0) {
-                        pointAngle = -180 - newTheta + currentAngle;
+                        pointAngle = -180 - newTheta; // + currentAngle;
                     }   
                     else {
-                        pointAngle = 180 - newTheta + currentAngle;
+                        pointAngle = 180 - newTheta; // + currentAngle;
                     }
                 }
 
                 else {
-                    pointAngle = currentAngle - newTheta;
+                    pointAngle = newTheta; // currentAngle - newTheta;
                 }
                 
                 
@@ -100,13 +113,13 @@ public class AimToShootPoseOnly extends Command {  //the code within the class A
                 }
 
                 // Convert Angle to Ticks
-                double targetPosition = pointAngle / 9.2571428;
+                // double targetPosition = pointAngle / 9.2571428;
 
                 // Set Target Position
-                RobotContainer.turret.setTargetPosition(targetPosition);
+                RobotContainer.turret.setTargetPosition(0.0);
 
                 if (onTarget == false) {
-                    Robot.robotContainer.doubleRumble();  // rumble joystick
+                  Robot.robotContainer.doubleRumble();  // rumble joystick
                 } 
                 
                 else {  
@@ -139,19 +152,19 @@ public class AimToShootPoseOnly extends Command {  //the code within the class A
 
                 if (DriverStation.getAlliance().get() == Alliance.Red) {
                     if (currentAngle > 0) {
-                        pointAngle = - newThetaPass + currentAngle;  // was -180-
+                        pointAngle = - newThetaPass;// + currentAngle;  // was -180-
                     }
                     else {
-                        pointAngle = - newThetaPass + currentAngle;    // was 180-
+                        pointAngle = - newThetaPass; // + currentAngle;    // was 180-
                     }
                 }
 
                 else {
                     if (currentAngle > 0) {
-                        pointAngle = -180 - newThetaPass + currentAngle;  // was -180-
+                        pointAngle = -180 - newThetaPass; // + currentAngle;  // was -180-
                     }
                     else {
-                        pointAngle = 180 - newThetaPass + currentAngle;    // was 180-
+                        pointAngle = 180 - newThetaPass; // + currentAngle;    // was 180-
                     }
                 }
 
@@ -161,18 +174,23 @@ public class AimToShootPoseOnly extends Command {  //the code within the class A
                 pointAngle = pointAngle - speedTP*1.2;//the target pose based on relative x and y speed of the robot
                 tDistance = tDistance - speedD*1.2;
 
-                
+                rotationVal = angleController.calculate(currentAngle,pointAngle);
+
                 // Convert Angle to Ticks
-                double targetPosition = pointAngle / 9.2571428;
-                    
+                // double targetPosition = pointAngle / 9.2571428;                    
 
                 //Distance affects Hood Angle and Shooter Speed
                 hoodPosition = (Constants.Shooter.HoodPassing.a*tDistance*tDistance) + (Constants.Shooter.HoodPassing.b*tDistance)+(Constants.Shooter.HoodPassing.c);
                 shooterSpeed = (Constants.Shooter.ShooterPassing.a*tDistance*tDistance) + (Constants.Shooter.ShooterPassing.b*tDistance)+(Constants.Shooter.ShooterPassing.c); 
-
-                    
+      
                 // Set Target Position
-                RobotContainer.turret.setTargetPosition(targetPosition);
+                RobotContainer.drivetrain.setControl(poseDrive
+                    .withVelocityX(distanceVal * 5.2) // Drive forward with negative Y (forward)
+                    .withVelocityY(strafeVal * 5.2) // Drive left with negative X (left)
+                    .withRotationalRate(pointAngle * 0.75)
+                );
+
+                RobotContainer.turret.setTargetPosition(0.0);
 
                 //Send Values
                 RobotContainer.shooter.setTargetVelocity(shooterSpeed);
