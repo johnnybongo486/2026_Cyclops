@@ -62,8 +62,8 @@ public final class Constants {
       public static double c = -10.24743;
     }
     public static class Turret {
-      public static double MinimumTurretPosition = -21.2;
-      public static double MaximumTurretPosition = 12.2;  //todo
+      public static double MinimumTurretPosition = 0;
+      public static double MaximumTurretPosition = 0;  //todo
     }
     public static class ShooterSpeed {
       public static double a = 0.46691434209640875;

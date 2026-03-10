@@ -16,10 +16,7 @@ import frc.robot.commands.Serializer.StopDrum;
 import frc.robot.commands.Shooter.JoystickShooter;
 import frc.robot.commands.Shooter.SetShooterVelocity;
 import frc.robot.commands.Swerve.TeleopDrive;
-import frc.robot.commands.Turret.AimToShoot;
-import frc.robot.commands.Turret.AimToShootPose;
 import frc.robot.commands.Turret.AimToShootPoseOnly;
-import frc.robot.commands.Turret.AutoAim;
 import frc.robot.commands.Turret.AutoAimPose;
 import frc.robot.commands.Turret.ContinuousSetShooterAndHood;
 import frc.robot.commands.Turret.JoystickTurret;
@@ -188,7 +185,6 @@ public class RobotContainer {
     driverController.leftTrigger().onFalse(new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));
 
     // shoot using turret camera; use in case the pose is sad
-    driverController.rightTrigger().whileTrue(new AimToShootPose());
     // driverController.rightTrigger().onFalse(new AutoAimPose());
     driverController.rightTrigger().onFalse(new AutoAimPose().alongWith(new SetHoodPosition(0)));
 

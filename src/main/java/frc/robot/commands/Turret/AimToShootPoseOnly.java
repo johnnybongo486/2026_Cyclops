@@ -100,13 +100,13 @@ public class AimToShootPoseOnly extends Command {  //the code within the class A
                 }
 
                 // Convert Angle to Ticks
-                double targetPosition = pointAngle / 9.2571428;
+                // double targetPosition = pointAngle / 9.2571428;
 
                 // Set Target Position
-                RobotContainer.turret.setTargetPosition(targetPosition);
+                RobotContainer.turret.setTargetPosition(0.0);
 
                 if (onTarget == false) {
-                    Robot.robotContainer.doubleRumble();  // rumble joystick
+                  //  Robot.robotContainer.doubleRumble();  // rumble joystick
                 } 
                 
                 else {  
@@ -163,7 +163,7 @@ public class AimToShootPoseOnly extends Command {  //the code within the class A
 
                 
                 // Convert Angle to Ticks
-                double targetPosition = pointAngle / 9.2571428;
+                // double targetPosition = pointAngle / 9.2571428;
                     
 
                 //Distance affects Hood Angle and Shooter Speed
@@ -172,7 +172,7 @@ public class AimToShootPoseOnly extends Command {  //the code within the class A
 
                     
                 // Set Target Position
-                RobotContainer.turret.setTargetPosition(targetPosition);
+                RobotContainer.turret.setTargetPosition(0.0);
 
                 //Send Values
                 RobotContainer.shooter.setTargetVelocity(shooterSpeed);
