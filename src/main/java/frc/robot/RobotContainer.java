@@ -142,13 +142,13 @@ public class RobotContainer {
     registerNamedCommands();
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto settings");
-    autoChooser.addOption("MidPassRight", new PathPlannerAuto("MidPassRight"));
-    autoChooser.addOption("MidPassLeft", new PathPlannerAuto("MidPassLeft"));
-    autoChooser.addOption("DoubleShotRight", new PathPlannerAuto("DoubleShotRight"));
-    autoChooser.addOption("DoubleShotRightSteal", new PathPlannerAuto("DoubleShotRightSteal"));
-    autoChooser.addOption("DoubleShotLeft", new PathPlannerAuto("DoubleShotLeft"));
-    autoChooser.addOption("DoubleShotLeftDepot", new PathPlannerAuto("DoubleShotLeftDepot"));
-    autoChooser.addOption("Depot", new PathPlannerAuto("Depot"));
+    // autoChooser.addOption("MidPassRight", new PathPlannerAuto("MidPassRight"));
+    // autoChooser.addOption("MidPassLeft", new PathPlannerAuto("MidPassLeft"));
+    // autoChooser.addOption("DoubleShotRight", new PathPlannerAuto("DoubleShotRight"));
+    // autoChooser.addOption("DoubleShotRightSteal", new PathPlannerAuto("DoubleShotRightSteal"));
+    // autoChooser.addOption("DoubleShotLeft", new PathPlannerAuto("DoubleShotLeft"));
+    // autoChooser.addOption("DoubleShotLeftDepot", new PathPlannerAuto("DoubleShotLeftDepot"));
+    // autoChooser.addOption("Depot", new PathPlannerAuto("Depot"));
     
     autoTab.add("Mode", autoChooser);
     
@@ -159,8 +159,9 @@ public class RobotContainer {
     //intake.setDefaultCommand(new StopIntake());
 
     // Choose a default turret command
-    turret.setDefaultCommand(new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));  // use only for matches
-    //turret.setDefaultCommand(new SetTurretPosition(0));  // stop turret when starting 
+    //turret.setDefaultCommand(new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));  // use only for matches
+    
+    turret.setDefaultCommand(new SetTurretPosition(0));  // stop turret when starting 
     //turret.setDefaultCommand(new JoystickTurret());
 
     drivetrain.setDefaultCommand(
@@ -210,11 +211,11 @@ public class RobotContainer {
     // shoot using pose only
     driverController.leftTrigger().whileTrue(new AimToShootPoseOnly());
     // driverController.leftTrigger().onFalse(new AutoAimPose());
-    driverController.leftTrigger().onFalse(new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));
+    driverController.leftTrigger().onFalse(new ContinuousSetShooterAndHood());
 
     // shoot using turret camera; use in case the pose is sad
     // driverController.rightTrigger().onFalse(new AutoAimPose());
-    driverController.rightTrigger().onFalse(new AutoAimPose().alongWith(new SetHoodPosition(0)));
+    // driverController.rightTrigger().onFalse(new AutoAimPose().alongWith(new SetHoodPosition(0)));
 
     //intake
     driverController.leftBumper().onTrue(new RunIntake().alongWith(new SlowAgitator()));

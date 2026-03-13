@@ -77,10 +77,10 @@ public class AimToShootPoseOnly extends Command {
 
             // Lateral component (perpendicular to target line): causes angular drift → lead angle
             double lateralSpeed = -vx * Math.sin(thetaRad) + vy * Math.cos(thetaRad);
-            double angularRate = lateralSpeed / Math.max(newDistance, 0.01) * (180.0 / Math.PI);
+            double angularRate = -lateralSpeed / Math.max(newDistance, 0.01) * (180.0 / Math.PI);
 
             // Radial component (toward/away from hub): positive = toward hub → decreases distance
-            double radialSpeed = -(vx * Math.cos(thetaRad) + vy * Math.sin(thetaRad));
+            double radialSpeed = (vx * Math.cos(thetaRad) + vy * Math.sin(thetaRad));
 
             pointAngle -= angularRate * tof;
             tDistance = Math.max(newDistance - radialSpeed * tof, 0.5);

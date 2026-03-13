@@ -78,7 +78,7 @@ public final class Constants {
     // Estimated projectile speed in m/s — used to compute time-of-flight for lead angle.
     // Tune by shooting from a known distance at known robot speed and adjusting until shots land.
     public static class ProjectileSpeed {
-      public static double metersPerSecond = 15.0;
+      public static double metersPerSecond = 3.0; // 15
     }
   }
 
