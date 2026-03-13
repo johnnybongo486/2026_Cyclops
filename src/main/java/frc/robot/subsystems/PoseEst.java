@@ -60,7 +60,9 @@ public class PoseEst extends SubsystemBase{
     private double safeMax;
 
 
-    public Optional<Alliance> alliance = DriverStation.getAlliance();
+    // Refreshed each loop in updatePose() — do not cache at construction time since FMS
+    // may not have set the alliance yet when robot code first starts.
+    public Optional<Alliance> alliance = Optional.empty();
 
     public PoseEst(){
         RobotContainer.drivetrain.getPigeon2().setYaw(0);
@@ -74,6 +76,9 @@ public class PoseEst extends SubsystemBase{
     }
 
     public void updatePose() {
+        // Refresh alliance every loop so it's never stale from pre-FMS-connect startup
+        alliance = DriverStation.getAlliance();
+
         //Send data to LL
         LimelightHelpers.SetRobotOrientation("limelight-right", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
         LimelightHelpers.SetRobotOrientation("limelight-left", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
@@ -344,28 +349,34 @@ public class PoseEst extends SubsystemBase{
         double xR = currentPose.getX();
         double yR = currentPose.getY();
 
+        // Read passing mode fresh here — avoids depending on the caller having called
+        // getPassingMode() first to update the stale passingMode field.
+        boolean currentlyPassing = getPassingMode();
+
         if (DriverStation.getAlliance().isPresent() == true) {
-        
-            if (DriverStation.getAlliance().get() == Alliance.Red){  // added passing mode!
-                if (passingMode == false) {
+
+            if (DriverStation.getAlliance().get() == Alliance.Red) {
+                if (!currentlyPassing) {
                     xH = targetHubPoseRed.getX();
                     yH = targetHubPoseRed.getY();
-                }
-                
-                else {
+                } else if (currentPose.getY() >= 4) {
                     xH = targetHPSPassPoseRed.getX();
                     yH = targetHPSPassPoseRed.getY();
+                } else {
+                    xH = targetDepotPassPoseRed.getX();
+                    yH = targetDepotPassPoseRed.getY();
                 }
             }
             else {
-                if (passingMode == false) {
+                if (!currentlyPassing) {
                     xH = targetHubPoseBlue.getX();
                     yH = targetHubPoseBlue.getY();
-                }
-                
-                else {
+                } else if (currentPose.getY() <= 4) {
                     xH = targetHPSPassPoseBlue.getX();
                     yH = targetHPSPassPoseBlue.getY();
+                } else {
+                    xH = targetDepotPassPoseBlue.getX();
+                    yH = targetDepotPassPoseBlue.getY();
                 }
             }
 

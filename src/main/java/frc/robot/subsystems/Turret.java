@@ -19,6 +19,20 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/**
+ * PROTOTYPE MODE — turret hardware does not exist on this prototype.
+ *
+ * All motor output is suppressed (positionControl() is a no-op).
+ * All state-tracking methods (setTargetPosition, incrementTargetPosition, isInPosition, etc.)
+ * continue to operate normally so the rest of the codebase compiles and runs without change.
+ *
+ * Rotation is redirected to the drivetrain via SwerveRequest.FieldCentricFacingAngle.
+ * See AutoAimPose.java and AimToShootPoseOnly.java for the redirect logic.
+ *
+ * To restore real turret behavior: remove this comment block, uncomment the
+ * turretKraken.setControl() line in positionControl(), and re-tune the heading controller
+ * gains in RobotContainer.
+ */
 public class Turret extends SubsystemBase implements IPositionControlledSubsystem {
 
 	private boolean isHoldingPosition = false;
@@ -79,10 +93,10 @@ public class Turret extends SubsystemBase implements IPositionControlledSubsyste
 	}
 
 	public void positionControl() {
-		this.manageMotion(targetPosition);
         targetPositionDutyCycle.withPosition(targetPosition);
         targetPositionDutyCycle.withFeedForward(feedForward);
-		this.turretKraken.setControl(targetPositionDutyCycle);
+        // PROTOTYPE MODE: motor output suppressed — rotation redirected to drivetrain.
+        // this.turretKraken.setControl(targetPositionDutyCycle);
 	}
 
 	public void positionManualControl(double targetPosition) {
@@ -112,7 +126,7 @@ public class Turret extends SubsystemBase implements IPositionControlledSubsyste
 	public boolean setTargetPosition(double position) {
 		if (!isValidPosition(position)) {
 			setOnTarget(false);
-			// RobotContainer.caNdleSubsystem.setAnimate("Strobe Red");
+			RobotContainer.caNdleSubsystem.setAnimate("Strobe Red");
 			return false;
 		} else {
 			this.targetPosition = position;

@@ -76,7 +76,6 @@ public class Hood extends SubsystemBase implements IPositionControlledSubsystem 
 	}
 
 	public void positionControl() {
-		this.manageMotion(targetPosition);
         targetPositionDutyCycle.withPosition(targetPosition);
         targetPositionDutyCycle.withFeedForward(feedForward);
 		this.hoodKraken.setControl(targetPositionDutyCycle);

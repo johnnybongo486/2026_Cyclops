@@ -16,6 +16,7 @@ import frc.robot.commands.Serializer.StopDrum;
 import frc.robot.commands.Shooter.JoystickShooter;
 import frc.robot.commands.Shooter.SetShooterVelocity;
 import frc.robot.commands.Swerve.TeleopDrive;
+import frc.robot.commands.Turret.AimToShoot;
 import frc.robot.commands.Turret.AimToShootPoseOnly;
 import frc.robot.commands.Turret.AutoAimPose;
 import frc.robot.commands.Turret.ContinuousSetShooterAndHood;
@@ -75,11 +76,33 @@ public class RobotContainer {
   private final int rotationAxis = XboxController.Axis.kRightX.value;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
+  // No velocity-level deadband here — TeleopDrive already applies a 5% stick deadband via
+  // MathUtil.applyDeadband before scaling to m/s. A second deadband here compounded to ~15%
+  // stick deflection before the robot moved.
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-    .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+
+  /**
+   * PROTOTYPE MODE — used by AutoAimPose and AimToShootPoseOnly to rotate the whole
+   * robot toward the aiming target instead of moving the (non-existent) turret motor.
+   *
+   * Heading controller starting gains (tune on the practice field):
+   *   kP = 5.0  (rad/s per rad error — increase if rotation is sluggish)
+   *   kI = 0.0
+   *   kD = 0.05 (increase slightly if it overshoots)
+   *
+   * Note: the physical turret used kP=0.8, kI=0, kD=0.01 in duty_cycle/encoder-rotation
+   * units, which do not map numerically to the heading controller's rad/s per rad units.
+   *
+   * To restore the physical turret: comment out the drivetrain requirement in AutoAimPose
+   * and AimToShootPoseOnly, uncomment turretKraken.setControl() in Turret.positionControl(),
+   * and remove this field.
+   */
+  public static final SwerveRequest.FieldCentricFacingAngle facingAngle =
+      new SwerveRequest.FieldCentricFacingAngle()
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -111,6 +134,11 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    // PROTOTYPE MODE: configure heading controller for turret-to-drivetrain redirect.
+    // Tune kP first (raise until rotation tracks quickly without oscillating), then add kD.
+    facingAngle.HeadingController.setPID(5.0, 0.0, 0.05);
+    facingAngle.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
+
     registerNamedCommands();
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto settings");
@@ -131,8 +159,8 @@ public class RobotContainer {
     //intake.setDefaultCommand(new StopIntake());
 
     // Choose a default turret command
-    // turret.setDefaultCommand(new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));  // use only for matches
-    turret.setDefaultCommand(new SetTurretPosition(0));  // stop turret when starting 
+    turret.setDefaultCommand(new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));  // use only for matches
+    //turret.setDefaultCommand(new SetTurretPosition(0));  // stop turret when starting 
     //turret.setDefaultCommand(new JoystickTurret());
 
     drivetrain.setDefaultCommand(

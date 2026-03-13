@@ -62,8 +62,8 @@ public final class Constants {
       public static double c = -10.24743;
     }
     public static class Turret {
-      public static double MinimumTurretPosition = 0;
-      public static double MaximumTurretPosition = 0;  //todo
+      public static double MinimumTurretPosition = -21.2;
+      public static double MaximumTurretPosition = 12.2;  //todo
     }
     public static class ShooterSpeed {
       public static double a = 0.46691434209640875;
@@ -74,6 +74,11 @@ public final class Constants {
       public static double a = -0.5112327;
       public static double b = 11.38087;
       public static double c = 5; //7.48918  // 2
+    }
+    // Estimated projectile speed in m/s — used to compute time-of-flight for lead angle.
+    // Tune by shooting from a known distance at known robot speed and adjusting until shots land.
+    public static class ProjectileSpeed {
+      public static double metersPerSecond = 15.0;
     }
   }
 
