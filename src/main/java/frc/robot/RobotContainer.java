@@ -16,7 +16,6 @@ import frc.robot.commands.Serializer.StopDrum;
 import frc.robot.commands.Shooter.JoystickShooter;
 import frc.robot.commands.Shooter.SetShooterVelocity;
 import frc.robot.commands.Swerve.TeleopDrive;
-import frc.robot.commands.Turret.AimToShoot;
 import frc.robot.commands.Turret.AimToShootPoseOnly;
 import frc.robot.commands.Turret.AutoAimPose;
 import frc.robot.commands.Turret.ContinuousSetShooterAndHood;
@@ -149,7 +148,7 @@ public class RobotContainer {
     // autoChooser.addOption("DoubleShotLeft", new PathPlannerAuto("DoubleShotLeft"));
     // autoChooser.addOption("DoubleShotLeftDepot", new PathPlannerAuto("DoubleShotLeftDepot"));
     // autoChooser.addOption("Depot", new PathPlannerAuto("Depot"));
-    
+    autoChooser.addOption("CyclopsRight", new PathPlannerAuto("CyclopsRight"));
     autoTab.add("Mode", autoChooser);
     
     // Set Default Commands
@@ -208,7 +207,7 @@ public class RobotContainer {
     // pick up intake
     driverController.b().multiPress(2,1).onTrue(new SetIntakeWristPosition(0));
 
-    // shoot using pose only
+    // aim using pose only
     driverController.leftTrigger().whileTrue(new AimToShootPoseOnly());
     // driverController.leftTrigger().onFalse(new AutoAimPose());
     driverController.leftTrigger().onFalse(new ContinuousSetShooterAndHood());
@@ -281,6 +280,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("LowerIntake", new AutoLowerIntake());
         NamedCommands.registerCommand("RaiseIntake", new AutoRaiseIntake());
         NamedCommands.registerCommand("AutoAim", new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));
+        NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooterAndHood());
         NamedCommands.registerCommand("AimToShoot", new AimToShootPoseOnly());
         NamedCommands.registerCommand("AimToShoot8", new AimToShootPoseOnly().withTimeout(1.25));
         NamedCommands.registerCommand("AimToShoot20", new AimToShootPoseOnly().withTimeout(3));
