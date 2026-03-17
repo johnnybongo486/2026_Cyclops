@@ -5,7 +5,7 @@
     "data": {
       "commands": [
         {
-          "type": "deadline",
+          "type": "sequential",
           "data": {
             "commands": [
               {
@@ -66,15 +66,15 @@
           "data": {
             "commands": [
               {
-                "type": "named",
-                "data": {
-                  "name": "StopShoot"
-                }
-              },
-              {
                 "type": "path",
                 "data": {
                   "pathName": "Cyclops 2 Right"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "StopShoot"
                 }
               }
             ]

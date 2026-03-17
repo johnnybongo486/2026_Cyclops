@@ -62,12 +62,12 @@ public class AimToShootPoseOnly extends Command {
             // --- SHOOTING MODE ---
 
             // Base turret angle (robot-relative degrees)
-            if (DriverStation.getAlliance().get() == Alliance.Red) {
-                pointAngle = (currentAngle > 0) ? -180 - newTheta + currentAngle
-                                                :  180 - newTheta + currentAngle;
-            } else {
-                pointAngle = currentAngle - newTheta;
-            }
+            // if (DriverStation.getAlliance().get() == Alliance.Red) {
+            //     pointAngle = (currentAngle > 0) ? -180 - newTheta + currentAngle
+            //                                     :  180 - newTheta + currentAngle;
+            // } else {
+            pointAngle = currentAngle - newTheta;
+            // }
 
             // Physics-based lead angle compensation.
             // newTheta is the angle of the (robot - hub) vector from the +X axis.
@@ -138,12 +138,12 @@ public class AimToShootPoseOnly extends Command {
             // --- PASSING MODE ---
             Robot.robotContainer.stopRumble();
 
-            if (DriverStation.getAlliance().get() == Alliance.Red) {
-                pointAngle = -newThetaPass + currentAngle;
-            } else {
-                pointAngle = (currentAngle > 0) ? -180 - newThetaPass + currentAngle
-                                               :  180 - newThetaPass + currentAngle;
-            }
+            // if (DriverStation.getAlliance().get() == Alliance.Red) {
+            //     pointAngle = -newThetaPass + currentAngle;
+            // } else {
+            pointAngle = (currentAngle > 0) ? -180 - newThetaPass + currentAngle
+                                            :  180 - newThetaPass + currentAngle;
+            // }
 
             SmartDashboard.putNumber("POINTANGLESHOOT", pointAngle);
 

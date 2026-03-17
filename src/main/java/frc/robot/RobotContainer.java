@@ -149,6 +149,8 @@ public class RobotContainer {
     // autoChooser.addOption("DoubleShotLeftDepot", new PathPlannerAuto("DoubleShotLeftDepot"));
     // autoChooser.addOption("Depot", new PathPlannerAuto("Depot"));
     autoChooser.addOption("CyclopsRight", new PathPlannerAuto("CyclopsRight"));
+    autoChooser.addOption("CyclopsTest", new PathPlannerAuto("CyclopsTest"));
+
     autoTab.add("Mode", autoChooser);
     
     // Set Default Commands
@@ -277,10 +279,10 @@ public class RobotContainer {
 
     public void registerNamedCommands() {
         /* Command registration for PathPlanner */     
-        NamedCommands.registerCommand("LowerIntake", new AutoLowerIntake());
+        NamedCommands.registerCommand("LowerIntake", new AutoLowerIntake().withTimeout(0.1));
         NamedCommands.registerCommand("RaiseIntake", new AutoRaiseIntake());
         NamedCommands.registerCommand("AutoAim", new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));
-        NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooterAndHood());
+        NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooterAndHood().withTimeout(0.1));
         NamedCommands.registerCommand("AimToShoot", new AimToShootPoseOnly());
         NamedCommands.registerCommand("AimToShoot8", new AimToShootPoseOnly().withTimeout(1.25));
         NamedCommands.registerCommand("AimToShoot20", new AimToShootPoseOnly().withTimeout(3));
