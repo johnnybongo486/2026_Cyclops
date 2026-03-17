@@ -30,7 +30,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Cyclops 1"
+                  "pathName": "Cyclops 1 Right"
                 }
               }
             ]
@@ -74,7 +74,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Cyclops 2"
+                  "pathName": "Cyclops 2 Right"
                 }
               }
             ]
