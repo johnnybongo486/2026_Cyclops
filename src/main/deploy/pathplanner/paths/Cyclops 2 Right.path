@@ -136,7 +136,7 @@
       "minWaypointRelativePos": 3.948387096774052,
       "maxWaypointRelativePos": 5.044168734491167,
       "constraints": {
-        "maxVelocity": 1.0,
+        "maxVelocity": 1.5,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -160,7 +160,7 @@
     "rotation": 37.32465257869817
   },
   "reversed": false,
-  "folder": "Cyclops",
+  "folder": "Cyclops Right",
   "idealStartingState": {
     "velocity": 0.0,
     "rotation": 40.156

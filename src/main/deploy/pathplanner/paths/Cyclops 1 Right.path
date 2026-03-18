@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.236701877934272,
-        "y": 0.7455281690140851
+        "x": 5.640551643192489,
+        "y": 0.6816549295774654
       },
       "isLocked": false,
       "linkedName": null
@@ -120,7 +120,7 @@
       "minWaypointRelativePos": 2.9528535980148196,
       "maxWaypointRelativePos": 4.014888337468956,
       "constraints": {
-        "maxVelocity": 1.0,
+        "maxVelocity": 1.5,
         "maxAcceleration": 3.0,
         "maxAngularVelocity": 540.0,
         "maxAngularAcceleration": 720.0,
@@ -144,7 +144,7 @@
     "rotation": 40.156
   },
   "reversed": false,
-  "folder": "Cyclops",
+  "folder": "Cyclops Right",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
