@@ -4,12 +4,14 @@
   "holonomicMode": true,
   "pathFolders": [
     "Blue",
+    "Cyclops Right",
+    "Depot",
     "DoubleShotLeft",
     "DoubleShotRight",
     "HP to Pass",
     "MidPassLeft",
     "MidPassRight",
-    "Depot",
+    "Cyclops Left",
     "Red"
   ],
   "autoFolders": [],

@@ -138,7 +138,9 @@ public class RobotContainer {
     // autoChooser.addOption("DoubleShotLeft", new PathPlannerAuto("DoubleShotLeft"));
     // autoChooser.addOption("DoubleShotLeftDepot", new PathPlannerAuto("DoubleShotLeftDepot"));
     // autoChooser.addOption("Depot", new PathPlannerAuto("Depot"));
-    
+    autoChooser.addOption("CyclopsRight", new PathPlannerAuto("CyclopsRight"));
+    autoChooser.addOption("CyclopsTest", new PathPlannerAuto("CyclopsTest"));
+
     autoTab.add("Mode", autoChooser);
     
     // Set Default Commands
@@ -190,7 +192,7 @@ public class RobotContainer {
     // pick up intake
     driverController.b().multiPress(2,1).onTrue(new SetIntakeWristPosition(0));
 
-    // shoot using pose only
+    // aim using pose only
     driverController.leftTrigger().whileTrue(new AimToShootPoseOnly());
     driverController.leftTrigger().onFalse(new ContinuousSetShooterAndHood());
 
@@ -248,8 +250,9 @@ public class RobotContainer {
 
     public void registerNamedCommands() {
         /* Command registration for PathPlanner */     
-        NamedCommands.registerCommand("LowerIntake", new AutoLowerIntake());
+        NamedCommands.registerCommand("LowerIntake", new AutoLowerIntake().withTimeout(0.1));
         NamedCommands.registerCommand("RaiseIntake", new AutoRaiseIntake());
+        NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooterAndHood().withTimeout(0.1));
         NamedCommands.registerCommand("AimToShoot", new AimToShootPoseOnly());
         NamedCommands.registerCommand("AimToShoot8", new AimToShootPoseOnly().withTimeout(1.25));
         NamedCommands.registerCommand("AimToShoot20", new AimToShootPoseOnly().withTimeout(3));
