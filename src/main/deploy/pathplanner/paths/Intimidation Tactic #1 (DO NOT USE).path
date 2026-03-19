@@ -1,0 +1,175 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.180901542111507,
+        "y": 7.354211150652431
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.180901542111507,
+        "y": 7.354211150652431
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 13.714151838671413,
+        "y": 7.354211150652431
+      },
+      "prevControl": {
+        "x": 13.467368051781577,
+        "y": 7.394183172471622
+      },
+      "nextControl": {
+        "x": 15.241957295375675,
+        "y": 7.106749703445921
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 13.864780545670229,
+        "y": 0.6835112692763936
+      },
+      "prevControl": {
+        "x": 14.97297746144922,
+        "y": 0.6619928825681041
+      },
+      "nextControl": {
+        "x": 11.570980503115488,
+        "y": 0.7280510759158013
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.180901542111507,
+        "y": 0.6835112692763936
+      },
+      "prevControl": {
+        "x": 3.4308838285748093,
+        "y": 0.6864872488763447
+      },
+      "nextControl": {
+        "x": 1.3733570581277499,
+        "y": 0.661992882568104
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 3.180901542111507,
+        "y": 7.354211150652431
+      },
+      "prevControl": {
+        "x": 1.3195610913424591,
+        "y": 7.408007117443549
+      },
+      "nextControl": {
+        "x": 3.4307971937001254,
+        "y": 7.346988732975669
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 8.894033214709372,
+        "y": 7.354211150652431
+      },
+      "prevControl": {
+        "x": 8.648937548250178,
+        "y": 7.465865843148802
+      },
+      "nextControl": {
+        "x": 9.86236061684661,
+        "y": 6.913084223018875
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 13.714151838671413,
+        "y": 7.354211150652431
+      },
+      "prevControl": {
+        "x": 13.532824376361045,
+        "y": 8.055869591756498
+      },
+      "nextControl": {
+        "x": 13.961613285885758,
+        "y": 6.396642941880085
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 15.02677342823451,
+        "y": 4.287841043896694
+      },
+      "prevControl": {
+        "x": 15.067873175071908,
+        "y": 4.041242562940501
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": -0.0
+    },
+    {
+      "waypointRelativePos": 2,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 3,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 4,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 5,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 6.0,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 90.0,
+    "maxAcceleration": 90.0,
+    "maxAngularVelocity": 5400.0,
+    "maxAngularAcceleration": 7200.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -1.023030188110584
+  },
+  "reversed": false,
+  "folder": "Captain K's Caustic Corroding Catalogue of Coordinated Corrupt Catastrophic Contingencies",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": false
+}

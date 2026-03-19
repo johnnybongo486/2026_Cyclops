@@ -252,13 +252,13 @@ public class RobotContainer {
         /* Command registration for PathPlanner */     
         NamedCommands.registerCommand("LowerIntake", new AutoLowerIntake().withTimeout(0.1));
         NamedCommands.registerCommand("RaiseIntake", new AutoRaiseIntake());
-        NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooterAndHood().withTimeout(0.1));
+        NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooterAndHood());
         NamedCommands.registerCommand("AimToShoot", new AimToShootPoseOnly());
         NamedCommands.registerCommand("AimToShoot8", new AimToShootPoseOnly().withTimeout(1.25));
         NamedCommands.registerCommand("AimToShoot20", new AimToShootPoseOnly().withTimeout(3));
         NamedCommands.registerCommand("AimToShoot30", new AimToShootPoseOnly().withTimeout(4));
         NamedCommands.registerCommand("AimToShoot60", new AimToShootPoseOnly().withTimeout(6));
-        NamedCommands.registerCommand("ShootCommand", new RunAgitator().alongWith(new RunUptake().alongWith(new RunIntake())));
+        NamedCommands.registerCommand("ShootCommand", new RunAgitator().alongWith(new RunUptake().alongWith(new RunIntake().withTimeout(2.5))));
         NamedCommands.registerCommand("RunIntake", new RunIntake().alongWith(new SlowAgitator()));
         NamedCommands.registerCommand("StopShoot", new StopUptake());
     }

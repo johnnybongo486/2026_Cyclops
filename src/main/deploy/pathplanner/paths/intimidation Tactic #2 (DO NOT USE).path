@@ -1,0 +1,125 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.0,
+        "y": 7.0
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.041032028469752,
+        "y": 7.429525504151838
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.32258600237248,
+        "y": 7.171304863582444
+      },
+      "prevControl": {
+        "x": 6.1289205219454335,
+        "y": 7.70926453143535
+      },
+      "nextControl": {
+        "x": 6.472846330206808,
+        "y": 6.753915064042644
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.849786476868328,
+        "y": 5.772609727164888
+      },
+      "prevControl": {
+        "x": 6.507853962895894,
+        "y": 5.772609727164888
+      },
+      "nextControl": {
+        "x": 7.473819691577699,
+        "y": 5.772609727164888
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 10.7876512455516,
+        "y": 5.772609727164888
+      },
+      "prevControl": {
+        "x": 8.227328337034121,
+        "y": 5.761897079012096
+      },
+      "nextControl": {
+        "x": 13.359098457888495,
+        "y": 5.783368920521946
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 17.415314353499408,
+        "y": 5.772609727164888
+      },
+      "prevControl": {
+        "x": 16.415314353499408,
+        "y": 5.772609727164888
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 2,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 3,
+      "rotationDegrees": 0.0
+    }
+  ],
+  "constraintZones": [
+    {
+      "name": "Constraints Zone",
+      "minWaypointRelativePos": 1.8987626546681464,
+      "maxWaypointRelativePos": 4.0,
+      "constraints": {
+        "maxVelocity": 150.0,
+        "maxAcceleration": 150.0,
+        "maxAngularVelocity": 540.0,
+        "maxAngularAcceleration": 720.0,
+        "nominalVoltage": 12.0,
+        "unlimited": false
+      }
+    }
+  ],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "Captain K's Caustic Corroding Catalogue of Coordinated Corrupt Catastrophic Contingencies",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}
