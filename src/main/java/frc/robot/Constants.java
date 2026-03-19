@@ -20,15 +20,11 @@ public final class Constants {
 
   public static class Serializer{
     public static class Uptake{
-        public static final double UptakeRunSpeed = 0.8;  // 1.0 pbot 0.7 real
+        public static final double UptakeRunSpeed = 1.0;  // 1.0 pbot 0.7 real
         public static final double UptakeStopSpeed = 0.0;
     }
-      public static class Drum{
-        public static final double DrumRunSpeed = 1.0; // was 0.8 real  // -0.55 pbot
-        public static final double DrumStopSpeed = 0.0;
-    }
       public static class Agitator{
-        public static final double AgitatorRunSpeed = 0.2;  // was .5
+        public static final double AgitatorRunSpeed = 1.0;  // was .5
         public static final double AgitatorSlowSpeed = 0.1;
         public static final double AgitatorStopSpeed = 0.0;
     }
@@ -49,7 +45,7 @@ public final class Constants {
   public static class Shooter{
     public static class Hood {
       public static double StoreHoodPosition = 0.0;
-      public static double FullUpPosition = 12.8;  //todo
+      public static double FullUpPosition = 12;  //todo
     }
     public static class HoodShooting {
       public static double a = -0.26400351354472845;
@@ -60,10 +56,6 @@ public final class Constants {
       public static double a = -0.269210;
       public static double b = 4.12897;
       public static double c = -10.24743;
-    }
-    public static class Turret {
-      public static double MinimumTurretPosition = -21.2;
-      public static double MaximumTurretPosition = 12.2;  //todo
     }
     public static class ShooterSpeed {
       public static double a = 0.46691434209640875;

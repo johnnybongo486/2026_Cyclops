@@ -250,7 +250,7 @@ public class PoseEst extends SubsystemBase{
     public boolean getIsSafe(){
 
         Pose2d currentPose = RobotContainer.drivetrain.getState().Pose;
-        double currentVelocity = RobotContainer.turret.getXSpeed();
+        double currentVelocity = RobotContainer.drivetrain.getXSpeed();
 
         if (DriverStation.getAlliance().isPresent() == true) {
 

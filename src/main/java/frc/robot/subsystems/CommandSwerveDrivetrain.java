@@ -19,6 +19,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -30,7 +31,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import frc.robot.RobotContainer;
 import frc.robot.generated.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -358,6 +359,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Optional<Pose2d> samplePoseAt(double timestampSeconds) {
         return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
     }
+
+    public double getXSpeed(){
+		ChassisSpeeds speed = RobotContainer.drivetrain.getState().Speeds;
+		Rotation2d angle = RobotContainer.drivetrain.getState().Pose.getRotation();
+		double xSpeed = ChassisSpeeds.fromRobotRelativeSpeeds(speed,angle).vxMetersPerSecond;
+		return xSpeed;
+	}
+
+	public double getYSpeed(){
+		ChassisSpeeds speed = RobotContainer.drivetrain.getState().Speeds;
+		Rotation2d angle = RobotContainer.drivetrain.getState().Pose.getRotation();
+		double ySpeed = ChassisSpeeds.fromRobotRelativeSpeeds(speed,angle).vyMetersPerSecond;
+		return ySpeed;
+	}
+
+	public double getRSpeed(){
+		double rSpeed = RobotContainer.drivetrain.getState().Speeds.omegaRadiansPerSecond;
+		return rSpeed;
+	}
 
     
 }

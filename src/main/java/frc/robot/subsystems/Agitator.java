@@ -25,7 +25,7 @@ public class Agitator extends SubsystemBase {
 
         /* Current Limiting */
         agitatorFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        agitatorFXConfig.CurrentLimits.StatorCurrentLimit = 20;
+        agitatorFXConfig.CurrentLimits.StatorCurrentLimit = 30;
 
         /* PID Config */
         agitatorFXConfig.Slot0.kP = 0.2;

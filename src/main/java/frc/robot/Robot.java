@@ -35,13 +35,15 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    RobotContainer.turret.updateDashboard();
     RobotContainer.intakeWrist.updateDashboard();
     RobotContainer.hood.updateDashboard();
     RobotContainer.shooter.updateDashboard();
     RobotContainer.shooterLimelight.updateDashboard();
     RobotContainer.poseEst.updatePose();
     RobotContainer.poseEst.updateDashboard();
+    RobotContainer.intake.updateDashboard();
+    RobotContainer.uptake.updateDashboard();
+    RobotContainer.agitator.updateDashboard();
 
     // this works but can it not HAVE to run?  RobotContainer.poseLimelight.updateLLPositions();
 

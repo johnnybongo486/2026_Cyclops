@@ -1,4 +1,4 @@
-package frc.robot.commands.Turret;
+package frc.robot.commands.Shooter;
 
 import frc.robot.Constants;
 import frc.robot.RobotContainer;

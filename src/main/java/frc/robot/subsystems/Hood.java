@@ -42,7 +42,7 @@ public class Hood extends SubsystemBase implements IPositionControlledSubsystem 
 		
         /** Shooter Motor Configuration */
         /* Motor Inverts and Neutral Mode */
-		hoodFXConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+		hoodFXConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         hoodFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
 
         /* Current Limiting */

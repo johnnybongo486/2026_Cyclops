@@ -35,21 +35,28 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 
 	private final static double onTargetThreshold = 0.05;
 
-	public TalonFX shooterKraken = new TalonFX(DeviceIds.Shooter.LeadMotorId, "canivore");
-    public TalonFX shooterKrakenFollower = new TalonFX(DeviceIds.Shooter.FollowerMotorId, "canivore");
+	public TalonFX leftShooterKraken = new TalonFX(DeviceIds.Shooter.LeadLeftMotorId, "canivore");
+    public TalonFX leftShooterKrakenFollower = new TalonFX(DeviceIds.Shooter.FollowerLeftMotorId, "canivore");
+	public TalonFX rightShooterKraken = new TalonFX(DeviceIds.Shooter.LeadRightMotorId, "canivore");
+    public TalonFX rightShooterKrakenFollower = new TalonFX(DeviceIds.Shooter.FollowerRightMotorId, "canivore");
 	public TalonFXConfiguration shooterFXConfig = new TalonFXConfiguration();
 
 	public Shooter() {
         // Clear Sticky Faults
-		this.shooterKraken.clearStickyFaults();
-		this.shooterKrakenFollower.clearStickyFaults();
+		this.leftShooterKraken.clearStickyFaults();
+		this.leftShooterKrakenFollower.clearStickyFaults();
+		this.rightShooterKraken.clearStickyFaults();
+		this.rightShooterKrakenFollower.clearStickyFaults();
 		
         // Set Followers
-		this.shooterKrakenFollower.setControl(new Follower(DeviceIds.Shooter.LeadMotorId, MotorAlignmentValue.Opposed));
+		this.leftShooterKrakenFollower.setControl(new Follower(DeviceIds.Shooter.LeadLeftMotorId, MotorAlignmentValue.Aligned));
+		this.rightShooterKraken.setControl(new Follower(DeviceIds.Shooter.LeadLeftMotorId, MotorAlignmentValue.Opposed));
+		this.rightShooterKrakenFollower.setControl(new Follower(DeviceIds.Shooter.LeadLeftMotorId, MotorAlignmentValue.Opposed));
+
 		
 		/** Shooter Motor Configuration */
         /* Motor Inverts and Neutral Mode */
-		shooterFXConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+		shooterFXConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
         shooterFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
 		// Current Limiting
@@ -79,18 +86,20 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 		shooterFXConfig.TorqueCurrent.PeakReverseTorqueCurrent = 40;
 
         // Config Motor
-        shooterKraken.getConfigurator().apply(shooterFXConfig);
-        shooterKraken.getConfigurator().setPosition(0.0);
-		shooterKrakenFollower.getConfigurator().setPosition(0);
+        leftShooterKraken.getConfigurator().apply(shooterFXConfig);
+        leftShooterKraken.getConfigurator().setPosition(0.0);
+		leftShooterKrakenFollower.getConfigurator().setPosition(0);
+		rightShooterKraken.getConfigurator().setPosition(0.0);
+		rightShooterKrakenFollower.getConfigurator().setPosition(0);
 	}
 
 	public void velocityControl() {
 		targetVelocityDutyCycle.withVelocity(targetVelocity);
-		this.shooterKraken.setControl(targetVelocityDutyCycle);
+		this.leftShooterKraken.setControl(targetVelocityDutyCycle);
 	}
 
 	public double getCurrentDraw() {
-		return this.shooterKraken.getSupplyCurrent().getValueAsDouble();
+		return this.leftShooterKraken.getSupplyCurrent().getValueAsDouble();
 	}
 
 	public boolean isHoldingVelocity() {
@@ -146,9 +155,10 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 
 	public void resetShooterEncoder() {
         try {
-			shooterKraken.getConfigurator().setPosition(0.0);
-			shooterKrakenFollower.getConfigurator().setPosition(0);
-
+			leftShooterKraken.getConfigurator().setPosition(0.0);
+			leftShooterKrakenFollower.getConfigurator().setPosition(0);
+			rightShooterKraken.getConfigurator().setPosition(0.0);
+			rightShooterKrakenFollower.getConfigurator().setPosition(0);
         }
         catch (Exception e) {
             DriverStation.reportError("Shooter.resetShooterEncoders exception.  You're Screwed! : " + e.toString(), false);
@@ -177,7 +187,7 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 
 	@Override
 	public double getCurrentVelocity() {
-		double currentVelocity = this.shooterKraken.getVelocity().getValueAsDouble();
+		double currentVelocity = this.leftShooterKraken.getVelocity().getValueAsDouble();
 		return currentVelocity;
 	}
 

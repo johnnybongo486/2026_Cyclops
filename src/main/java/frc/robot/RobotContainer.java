@@ -8,21 +8,14 @@ import frc.robot.commands.Hood.JoystickHood;
 import frc.robot.commands.Hood.SetHoodPosition;
 import frc.robot.commands.Serializer.StopUptake;
 import frc.robot.commands.Serializer.RunAgitator;
-import frc.robot.commands.Serializer.RunDrum;
 import frc.robot.commands.Serializer.RunUptake;
 import frc.robot.commands.Serializer.SlowAgitator;
 import frc.robot.commands.Serializer.StopAgitator;
-import frc.robot.commands.Serializer.StopDrum;
+import frc.robot.commands.Shooter.AimToShootPoseOnly;
+import frc.robot.commands.Shooter.ContinuousSetShooterAndHood;
 import frc.robot.commands.Shooter.JoystickShooter;
 import frc.robot.commands.Shooter.SetShooterVelocity;
 import frc.robot.commands.Swerve.TeleopDrive;
-import frc.robot.commands.Turret.AimToShoot;
-import frc.robot.commands.Turret.AimToShootPoseOnly;
-import frc.robot.commands.Turret.AutoAimPose;
-import frc.robot.commands.Turret.ContinuousSetShooterAndHood;
-import frc.robot.commands.Turret.JoystickTurret;
-import frc.robot.commands.Turret.SetTurretPosition;
-import frc.robot.commands.Turret.ZeroTurret;
 import frc.robot.dashboard.AutoAimDashboard;
 import frc.robot.generated.TunerConstants;
 import frc.robot.commands.Intake.JoystickIntakeWrist;
@@ -34,9 +27,7 @@ import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.ShooterLimelight;
-import frc.robot.subsystems.Turret;
 import frc.robot.subsystems.Uptake;
-import frc.robot.subsystems.Drum;
 import frc.robot.subsystems.Agitator;
 import frc.robot.subsystems.CANdleSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
@@ -111,9 +102,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public static Shooter shooter = new Shooter(); 
   public static Hood hood = new Hood();
-  public static Turret turret = new Turret();
   public static Uptake uptake = new Uptake();
-  public static Drum drum = new Drum();
   public static Agitator agitator = new Agitator();
   public static IntakeWrist intakeWrist = new IntakeWrist();
   public static Intake intake = new Intake();
@@ -154,16 +143,9 @@ public class RobotContainer {
     
     // Set Default Commands
     uptake.setDefaultCommand(new StopUptake());
-    drum.setDefaultCommand(new StopDrum());
-    //agitator.setDefaultCommand(new StopAgitator());
-    //intake.setDefaultCommand(new StopIntake());
-
-    // Choose a default turret command
-    //turret.setDefaultCommand(new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));  // use only for matches
+    agitator.setDefaultCommand(new StopAgitator());
+    intake.setDefaultCommand(new StopIntake());
     
-    turret.setDefaultCommand(new SetTurretPosition(0));  // stop turret when starting 
-    //turret.setDefaultCommand(new JoystickTurret());
-
     drivetrain.setDefaultCommand(
       new TeleopDrive(drivetrain,
       drive,
@@ -174,8 +156,8 @@ public class RobotContainer {
     );
     
     // Joysticks Used for Tuning
-    //hood.setDefaultCommand(new JoystickHood());
-    //shooter.setDefaultCommand(new JoystickShooter());
+    hood.setDefaultCommand(new JoystickHood());
+    shooter.setDefaultCommand(new JoystickShooter());
     //intakeWrist.setDefaultCommand(new JoystickIntakeWrist());
 
     // Configure the trigger bindings
@@ -199,10 +181,10 @@ public class RobotContainer {
     // neutral mode is applied to the drive motors while disabled.
 
     // Shoot
-    driverController.rightBumper().whileTrue(new RunAgitator().alongWith(new RunDrum().alongWith(new RunUptake().alongWith(new RunIntake().alongWith(new SetColorFlow())))));
-    driverController.rightBumper().onFalse(new StopDrum().alongWith(new StopUptake().alongWith(new SlowAgitator())));
+    driverController.rightBumper().whileTrue(new RunAgitator().alongWith(new RunUptake().alongWith(new SetColorFlow())));
+    driverController.rightBumper().onFalse(new StopUptake().alongWith(new SlowAgitator()));//.alongWith(new SetIntakeWristPosition(5.15)));
 
-    //drop intake
+    // drop intake
     driverController.b().onTrue(new SetIntakeWristPosition(5.15));
 
     // pick up intake
@@ -210,23 +192,11 @@ public class RobotContainer {
 
     // shoot using pose only
     driverController.leftTrigger().whileTrue(new AimToShootPoseOnly());
-    // driverController.leftTrigger().onFalse(new AutoAimPose());
     driverController.leftTrigger().onFalse(new ContinuousSetShooterAndHood());
-
-    // shoot using turret camera; use in case the pose is sad
-    // driverController.rightTrigger().onFalse(new AutoAimPose());
-    // driverController.rightTrigger().onFalse(new AutoAimPose().alongWith(new SetHoodPosition(0)));
 
     //intake
     driverController.leftBumper().onTrue(new RunIntake().alongWith(new SlowAgitator()));
     driverController.leftBumper().multiPress(2, 1).onTrue(new StopIntake().alongWith(new StopAgitator()));
-    //driverController.leftBumper().multiPress(2, 1).onTrue(new StopIntake().alongWith(new StopAgitator()).alongWith(new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition)).alongWith(new SetShooterVelocity((0))));
-  
-    // Operator Take Control of Turret (also Emergency Disable Turret)
-    operatorController.leftTrigger().whileTrue(new JoystickTurret());
-
-    // Operator Rezero
-    operatorController.leftTrigger().and(operatorController.a().onTrue(new ZeroTurret()));
 
     // Operator Emergency Fix Intake Belt
     operatorController.x().whileTrue(new ReverseIntake());
@@ -280,15 +250,13 @@ public class RobotContainer {
         /* Command registration for PathPlanner */     
         NamedCommands.registerCommand("LowerIntake", new AutoLowerIntake());
         NamedCommands.registerCommand("RaiseIntake", new AutoRaiseIntake());
-        NamedCommands.registerCommand("AutoAim", new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));
         NamedCommands.registerCommand("AimToShoot", new AimToShootPoseOnly());
         NamedCommands.registerCommand("AimToShoot8", new AimToShootPoseOnly().withTimeout(1.25));
         NamedCommands.registerCommand("AimToShoot20", new AimToShootPoseOnly().withTimeout(3));
         NamedCommands.registerCommand("AimToShoot30", new AimToShootPoseOnly().withTimeout(4));
         NamedCommands.registerCommand("AimToShoot60", new AimToShootPoseOnly().withTimeout(6));
-        NamedCommands.registerCommand("ShootCommand", new RunAgitator().alongWith(new RunDrum().alongWith(new RunUptake().alongWith(new RunIntake()))));
+        NamedCommands.registerCommand("ShootCommand", new RunAgitator().alongWith(new RunUptake().alongWith(new RunIntake())));
         NamedCommands.registerCommand("RunIntake", new RunIntake().alongWith(new SlowAgitator()));
-        NamedCommands.registerCommand("StopPass", new SetHoodPosition(0).andThen(new AutoAimPose()));
-        NamedCommands.registerCommand("StopShoot", new StopDrum().alongWith(new StopUptake()));
+        NamedCommands.registerCommand("StopShoot", new StopUptake());
     }
 }

@@ -1,4 +1,4 @@
-package frc.robot.commands.Turret;
+package frc.robot.commands.Shooter;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -32,7 +32,6 @@ public class AimToShootPoseOnly extends Command {
     public AimToShootPoseOnly() {
         addRequirements(RobotContainer.shooter);
         addRequirements(RobotContainer.hood);
-        addRequirements(RobotContainer.turret);
         // PROTOTYPE MODE: also require drivetrain so this command can rotate the robot.
         // *** AUTO CONFLICT WARNING ***
         // This command is registered as NamedCommands "AimToShoot", "AimToShoot8/20/30/60".
@@ -55,8 +54,8 @@ public class AimToShootPoseOnly extends Command {
         isPassingMode = RobotContainer.poseEst.getPassingMode();
 
         // Robot velocity in field frame (m/s) — from swerve state, much cleaner than finite diff
-        double vx = RobotContainer.turret.getXSpeed();
-        double vy = RobotContainer.turret.getYSpeed();
+        double vx = RobotContainer.drivetrain.getXSpeed();
+        double vy = RobotContainer.drivetrain.getYSpeed();
 
         if (!isPassingMode) {
             // --- SHOOTING MODE ---
@@ -87,7 +86,6 @@ public class AimToShootPoseOnly extends Command {
 
             // --- Turret calls (no-ops in prototype mode, motor output suppressed) ---
             double targetPosition = pointAngle / 9.2571428;
-            boolean targetValid = RobotContainer.turret.setTargetPosition(targetPosition);
 
             // Compute shooter/hood values based on effective shot distance
             hoodPosition = Constants.Shooter.HoodShooting.a * tDistance * tDistance
@@ -118,15 +116,9 @@ public class AimToShootPoseOnly extends Command {
                             .withVelocityX(driverVx)
                             .withVelocityY(driverVy));
 
-            if (targetValid) {
-                Robot.robotContainer.stopRumble();
-                RobotContainer.turret.positionControl();
-                if (RobotContainer.poseEst.getIsSafe()) {
-                    RobotContainer.hood.setTargetPosition(hoodPosition);
-                    RobotContainer.hood.positionControl();
-                }
-            } else {
-                Robot.robotContainer.doubleRumble();
+            if (RobotContainer.poseEst.getIsSafe()) {
+                RobotContainer.hood.setTargetPosition(hoodPosition);
+                RobotContainer.hood.positionControl();
             }
 
             SmartDashboard.putNumber("SOTM_TOF", tof);
@@ -159,7 +151,6 @@ public class AimToShootPoseOnly extends Command {
 
             // --- Turret calls (no-ops in prototype mode, motor output suppressed) ---
             double targetPosition = pointAngle / 9.2571428;
-            RobotContainer.turret.setTargetPosition(targetPosition);
 
             // PROTOTYPE MODE: rotate drivetrain to the heading the turret would have aimed at.
             double targetHeadingDeg = currentAngle - pointAngle;
@@ -184,7 +175,6 @@ public class AimToShootPoseOnly extends Command {
                          + Constants.Shooter.ShooterPassing.b * tDistance
                          + Constants.Shooter.ShooterPassing.c;
 
-            RobotContainer.turret.positionControl();
             RobotContainer.shooter.setTargetVelocity(shooterSpeed);
             RobotContainer.shooter.velocityControl();
             RobotContainer.hood.setTargetPosition(hoodPosition);
