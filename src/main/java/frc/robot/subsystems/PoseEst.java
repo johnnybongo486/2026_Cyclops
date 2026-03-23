@@ -20,6 +20,8 @@ public class PoseEst extends SubsystemBase{
 
     public boolean doRejectUpdateLeft = false;
     public boolean doRejectUpdateRight = false;
+    public boolean doRejectUpdateShooter = false;
+
     public boolean isPresent = false;
     private double theta = 0.0;
     private double robotAngle = 0.0;
@@ -71,8 +73,6 @@ public class PoseEst extends SubsystemBase{
             .add("Robot Facing Blue Driver Station?", false) // Initial value
             .withWidget("Toggle Button") // Makes it interactive
             .getEntry();
-        //LimelightHelpers.SetRobotOrientation("limelight-left", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
-        //LimelightHelpers.SetRobotOrientation("limelight-right", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
     }
 
     public void updatePose() {
@@ -82,33 +82,48 @@ public class PoseEst extends SubsystemBase{
         //Send data to LL
         LimelightHelpers.SetRobotOrientation("limelight-right", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
         LimelightHelpers.SetRobotOrientation("limelight-left", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation("limelight-shooter", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
         
         //Pull relative tag location
         LimelightHelpers.PoseEstimate mt2LeftBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
         LimelightHelpers.PoseEstimate mt2RightBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
+        LimelightHelpers.PoseEstimate mt2ShooterBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shooter");
+
 
         //init rejects
-        doRejectUpdateLeft = false;
-        doRejectUpdateRight = false; 
+        doRejectUpdateLeft = true; // falses
+        doRejectUpdateRight = true; 
+        doRejectUpdateShooter = false;
 
         if (alliance.isPresent()) {
 
-            if(mt2LeftBlue != null && mt2RightBlue != null) { // make sure we have the camera        
+            if(/*mt2LeftBlue != null && mt2RightBlue != null &&*/ mt2ShooterBlue != null) { // make sure we have the camera        
                 if(Math.abs(RobotContainer.drivetrain.getPigeon2().getAngularVelocityZDevice().getValueAsDouble()) > 720) {// if our angular velocity is greater than 720 degrees per second, ignore vision updates
                     doRejectUpdateLeft = true;
                     doRejectUpdateRight = true;
+                    doRejectUpdateShooter = true;
                 }
-                
+                /* 
                 if(mt2LeftBlue.tagCount == 0) {
                     doRejectUpdateLeft = true;
                 }
 
+                else{}
+
                 if(mt2RightBlue.tagCount == 0) {
                     doRejectUpdateRight = true;
                 }
+
+                else{}
+                */
+
+                if(mt2ShooterBlue.tagCount == 0) {
+                    doRejectUpdateShooter = true;
+                }
+                else{}
                 
                 // use this if one LL works
-                if( mt2LeftBlue.tagCount != 0 && mt2RightBlue.tagCount != 0 && Robot.robotContainer.driverController.leftTrigger().getAsBoolean() == true) {
+                /*if( mt2LeftBlue.tagCount != 0 && mt2RightBlue.tagCount != 0 && Robot.robotContainer.driverController.leftTrigger().getAsBoolean() == true) {
                 //if (Robot.robotContainer.driverController.leftTrigger().getAsBoolean() == true) {  // use this if no limelights
                     doRejectUpdateLeft = true;
                     //doRejectUpdateRight = true;
@@ -118,15 +133,18 @@ public class PoseEst extends SubsystemBase{
                 else {
                     rejectLL = false;
                 }
+                    */
 
-                
-            
                 if(!doRejectUpdateLeft) {
                     RobotContainer.drivetrain.addVisionMeasurement(mt2LeftBlue.pose, mt2LeftBlue.timestampSeconds, VecBuilder.fill(0.7,0.7,99999)); // n1: 0.7
                 }
 
                 if(!doRejectUpdateRight) {
                     RobotContainer.drivetrain.addVisionMeasurement(mt2RightBlue.pose, mt2RightBlue.timestampSeconds, VecBuilder.fill(0.7,0.7,99999)); // n1: 0.7
+                }
+
+                if(!doRejectUpdateShooter) {
+                    RobotContainer.drivetrain.addVisionMeasurement(mt2ShooterBlue.pose, mt2ShooterBlue.timestampSeconds, VecBuilder.fill(0.7,0.7,99999)); // n1: 0.7
                 }
             } 
             

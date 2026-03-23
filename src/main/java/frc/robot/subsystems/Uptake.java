@@ -17,19 +17,18 @@ public class Uptake extends SubsystemBase {
     private TalonFXConfiguration uptakeFXConfig = new TalonFXConfiguration();
     private TorqueCurrentFOC torqueDutyCycle = new TorqueCurrentFOC(0);
 
-
 	public Uptake() {
         /** Shooter Motor Configuration */
         /* Motor Inverts and Neutral Mode */
 		uptakeFXConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-        uptakeFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        uptakeFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
 
         /* Current Limiting */
         uptakeFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        uptakeFXConfig.CurrentLimits.StatorCurrentLimit = 50;
+        uptakeFXConfig.CurrentLimits.StatorCurrentLimit = 60;
 
         /* PID Config */
-        uptakeFXConfig.Slot0.kP = 0.2;
+        uptakeFXConfig.Slot0.kP = 1;
         uptakeFXConfig.Slot0.kI = 0;
         uptakeFXConfig.Slot0.kD = 0;
 
@@ -46,8 +45,7 @@ public class Uptake extends SubsystemBase {
 	}
 
 	public void setSpeed(double speed) {
-        //this.uptakeKraken.set(speed);
-        torqueDutyCycle.withOutput(50).withDeadband(1).withMaxAbsDutyCycle(speed);
+        torqueDutyCycle.withOutput(60).withDeadband(1).withMaxAbsDutyCycle(speed);
         this.uptakeKraken.setControl(torqueDutyCycle);
 	}
 

@@ -27,7 +27,7 @@ public class IntakeWrist extends SubsystemBase implements IPositionControlledSub
 	public double downPositionLimit = homePosition;
 	private double targetPosition = 0;
     private MotionMagicDutyCycle targetPositionDutyCycle = new MotionMagicDutyCycle(0);
-	private double feedForward = 0.0;
+	private double feedForward = -0.05;
 	public double shooterAddValue;
 
 	private final static double onTargetThreshold = 0.1;
@@ -46,22 +46,22 @@ public class IntakeWrist extends SubsystemBase implements IPositionControlledSub
 
         /* Current Limiting */
 		intakeWristFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        intakeWristFXConfig.CurrentLimits.StatorCurrentLimit = 40;
+        intakeWristFXConfig.CurrentLimits.StatorCurrentLimit = 50;
 
         /* PID Config */
-        intakeWristFXConfig.Slot0.kP = 0.4;
-        intakeWristFXConfig.Slot0.kI = 0;
-        intakeWristFXConfig.Slot0.kD = 0.01;
+        intakeWristFXConfig.Slot0.kP = 0.3;
+        intakeWristFXConfig.Slot0.kI = 0.0;
+        intakeWristFXConfig.Slot0.kD = 0.03;
 
         /* Open and Closed Loop Ramping */
-        intakeWristFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.25;
-        intakeWristFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.25;
+        intakeWristFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.1;
+        intakeWristFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.1;
 
         intakeWristFXConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0;
         intakeWristFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0;
 
         //Config Acceleration and Velocity
-        intakeWristFXConfig.MotionMagic.withMotionMagicAcceleration(300);
+        intakeWristFXConfig.MotionMagic.withMotionMagicAcceleration(600);
         intakeWristFXConfig.MotionMagic.withMotionMagicCruiseVelocity(300);
 
         // Config Motor

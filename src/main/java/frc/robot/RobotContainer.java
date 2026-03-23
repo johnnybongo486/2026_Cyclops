@@ -3,7 +3,6 @@ package frc.robot;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Auto.AutoLowerIntake;
 import frc.robot.commands.Auto.AutoRaiseIntake;
-import frc.robot.commands.CANdle.SetColorFlow;
 import frc.robot.commands.Hood.JoystickHood;
 import frc.robot.commands.Hood.SetHoodPosition;
 import frc.robot.commands.Serializer.StopUptake;
@@ -16,20 +15,19 @@ import frc.robot.commands.Shooter.ContinuousSetShooterAndHood;
 import frc.robot.commands.Shooter.JoystickShooter;
 import frc.robot.commands.Shooter.SetShooterVelocity;
 import frc.robot.commands.Swerve.TeleopDrive;
-import frc.robot.dashboard.AutoAimDashboard;
 import frc.robot.generated.TunerConstants;
 import frc.robot.commands.Intake.JoystickIntakeWrist;
 import frc.robot.commands.Intake.ReverseIntake;
 import frc.robot.commands.Intake.RunIntake;
+import frc.robot.commands.Intake.RunIntakeAuto;
+import frc.robot.commands.Intake.RunIntakeSlow;
 import frc.robot.commands.Intake.SetIntakeWristPosition;
 import frc.robot.commands.Intake.StopIntake;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.ShooterLimelight;
 import frc.robot.subsystems.Uptake;
 import frc.robot.subsystems.Agitator;
-import frc.robot.subsystems.CANdleSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeWrist;
 import frc.robot.subsystems.PoseEst;
@@ -39,15 +37,13 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-
 import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -106,10 +102,8 @@ public class RobotContainer {
   public static Agitator agitator = new Agitator();
   public static IntakeWrist intakeWrist = new IntakeWrist();
   public static Intake intake = new Intake();
-  public static ShooterLimelight shooterLimelight = new ShooterLimelight();
   public static PoseEst poseEst = new PoseEst();
   public static PoseLimelight poseLimelight = new PoseLimelight();
-  public static CANdleSubsystem caNdleSubsystem = new CANdleSubsystem();
 
   /* Path follower */
   private SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -131,13 +125,6 @@ public class RobotContainer {
     registerNamedCommands();
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto settings");
-    // autoChooser.addOption("MidPassRight", new PathPlannerAuto("MidPassRight"));
-    // autoChooser.addOption("MidPassLeft", new PathPlannerAuto("MidPassLeft"));
-    // autoChooser.addOption("DoubleShotRight", new PathPlannerAuto("DoubleShotRight"));
-    // autoChooser.addOption("DoubleShotRightSteal", new PathPlannerAuto("DoubleShotRightSteal"));
-    // autoChooser.addOption("DoubleShotLeft", new PathPlannerAuto("DoubleShotLeft"));
-    // autoChooser.addOption("DoubleShotLeftDepot", new PathPlannerAuto("DoubleShotLeftDepot"));
-    // autoChooser.addOption("Depot", new PathPlannerAuto("Depot"));
     autoChooser.addOption("CyclopsRight", new PathPlannerAuto("CyclopsRight"));
     autoChooser.addOption("CyclopsTest", new PathPlannerAuto("CyclopsTest"));
 
@@ -146,7 +133,9 @@ public class RobotContainer {
     // Set Default Commands
     uptake.setDefaultCommand(new StopUptake());
     agitator.setDefaultCommand(new StopAgitator());
-    intake.setDefaultCommand(new StopIntake());
+    //intake.setDefaultCommand(new StopIntake());
+    intake.setDefaultCommand(new RunIntakeAuto());
+
     
     drivetrain.setDefaultCommand(
       new TeleopDrive(drivetrain,
@@ -163,10 +152,7 @@ public class RobotContainer {
     //intakeWrist.setDefaultCommand(new JoystickIntakeWrist());
 
     // Configure the trigger bindings
-    configureBindings();
-
-    AutoAimDashboard.AddDashboard();
-      
+    configureBindings();      
     }
 
   /**
@@ -183,11 +169,11 @@ public class RobotContainer {
     // neutral mode is applied to the drive motors while disabled.
 
     // Shoot
-    driverController.rightBumper().whileTrue(new RunAgitator().alongWith(new RunUptake().alongWith(new SetColorFlow())));
-    driverController.rightBumper().onFalse(new StopUptake().alongWith(new SlowAgitator()));//.alongWith(new SetIntakeWristPosition(5.15)));
+    driverController.rightBumper().whileTrue(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(0))));//2
+    driverController.rightBumper().onFalse(new StopUptake().alongWith(new RunIntakeAuto()).alongWith(new SlowAgitator().alongWith(new SetIntakeWristPosition(0))));  //6.25
 
     // drop intake
-    driverController.b().onTrue(new SetIntakeWristPosition(5.15));
+    driverController.b().onTrue(new SetIntakeWristPosition(6.0));
 
     // pick up intake
     driverController.b().multiPress(2,1).onTrue(new SetIntakeWristPosition(0));
@@ -197,12 +183,18 @@ public class RobotContainer {
     driverController.leftTrigger().onFalse(new ContinuousSetShooterAndHood());
 
     //intake
-    driverController.leftBumper().onTrue(new RunIntake().alongWith(new SlowAgitator()));
+    driverController.leftBumper().onTrue(new RunIntakeAuto().alongWith(new SlowAgitator()));
     driverController.leftBumper().multiPress(2, 1).onTrue(new StopIntake().alongWith(new StopAgitator()));
 
     // Operator Emergency Fix Intake Belt
     operatorController.x().whileTrue(new ReverseIntake());
-    operatorController.x().onFalse(new RunIntake());
+    operatorController.x().onFalse(new StopIntake());
+
+    operatorController.y().whileTrue(new RunIntake());
+    operatorController.y().onFalse(new StopIntake());
+
+    operatorController.a().onTrue(new SetShooterVelocity(20));
+    operatorController.b().onTrue(new SetShooterVelocity(45));
 
   final var idle = new SwerveRequest.Idle();
     RobotModeTriggers.disabled().whileTrue(
