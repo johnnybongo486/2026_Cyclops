@@ -8,8 +8,6 @@ import frc.robot.RobotContainer;
 import frc.robot.generated.TunerConstants;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -84,9 +82,6 @@ public class AimToShootPoseOnly extends Command {
             pointAngle -= angularRate * tof;
             tDistance = Math.max(newDistance - radialSpeed * tof, 0.5);
 
-            // --- Turret calls (no-ops in prototype mode, motor output suppressed) ---
-            double targetPosition = pointAngle / 9.2571428;
-
             // Compute shooter/hood values based on effective shot distance
             hoodPosition = Constants.Shooter.HoodShooting.a * tDistance * tDistance
                          + Constants.Shooter.HoodShooting.b * tDistance
@@ -148,9 +143,6 @@ public class AimToShootPoseOnly extends Command {
 
             pointAngle -= angularRate * tof;
             tDistance = Math.max(newDistance - radialSpeed * tof, 0.5);
-
-            // --- Turret calls (no-ops in prototype mode, motor output suppressed) ---
-            double targetPosition = pointAngle / 9.2571428;
 
             // PROTOTYPE MODE: rotate drivetrain to the heading the turret would have aimed at.
             double targetHeadingDeg = currentAngle - pointAngle;
