@@ -26,6 +26,7 @@ public class AimToShootPoseOnly extends Command {
     private double currentAngle;
     private double pointAngle = 0;
     private boolean isPassingMode = false;
+    private double shooterAdder = 0;
 
     public AimToShootPoseOnly() {
         addRequirements(RobotContainer.shooter);
@@ -91,7 +92,9 @@ public class AimToShootPoseOnly extends Command {
                          + Constants.Shooter.ShooterSpeed.c;
 
             // Always pre-spin the shooter so the flywheel is ready when turret settles
-            RobotContainer.shooter.setTargetVelocity(shooterSpeed);
+            shooterAdder = RobotContainer.shooter.getShooterAdder();
+
+            RobotContainer.shooter.setTargetVelocity(shooterSpeed + shooterAdder);
             RobotContainer.shooter.velocityControl();
 
             // PROTOTYPE MODE: rotate drivetrain to the heading the turret would have aimed at.
@@ -120,6 +123,9 @@ public class AimToShootPoseOnly extends Command {
             SmartDashboard.putNumber("SOTM_AngularRate", angularRate);
             SmartDashboard.putNumber("SOTM_RadialSpeed", radialSpeed);
             SmartDashboard.putNumber("SOTM_tDistance", tDistance);
+            SmartDashboard.putNumber("ShooterTargetSOTM", shooterSpeed);
+            SmartDashboard.putNumber("ShooterAdderSOTM", shooterAdder);
+
 
         } else {
             // --- PASSING MODE ---
@@ -171,6 +177,7 @@ public class AimToShootPoseOnly extends Command {
             RobotContainer.shooter.velocityControl();
             RobotContainer.hood.setTargetPosition(hoodPosition);
             RobotContainer.hood.positionControl();
+            
         }
     }
 

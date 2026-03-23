@@ -1,41 +1,37 @@
-package frc.robot.commands.Intake;
+package frc.robot.commands.Shooter;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.RobotContainer;
-import frc.robot.Constants;
+import edu.wpi.first.wpilibj2.command.Command;
 
-public class RunIntakeAuto extends Command {
-    
-    public RunIntakeAuto() {
-        addRequirements(RobotContainer.intake);
-    }
+public class ShooterAdderCommand extends Command {
+	private double shooterVelocity = 0;
+
+	public ShooterAdderCommand(double shootervelocity) {
+		this.shooterVelocity = shootervelocity;
+	}
 
 	// Called just before this Command runs the first time
 	public void initialize() {
-
+		RobotContainer.shooter.setShooterAdder(shooterVelocity);
 	}
 
 	// Called repeatedly when this Command is scheduled to run
 	public void execute() {
-		if (RobotContainer.drivetrain.getState().Speeds.vxMetersPerSecond < -0.1) {
-        	RobotContainer.intake.setSpeed(Constants.Intake.IntakeRoller.IntakeRunSpeed);
-		}
-		else {
-			RobotContainer.intake.setSpeed(Constants.Intake.IntakeRoller.IntakeStopSpeed);
-		}
 	}
 
 	// Make this return true when this Command no longer needs to run execute()
 	public boolean isFinished() {
-		return false;
+			return false;
 	}
 
 	// Called once after isFinished returns true
 	protected void end() {
+
 	}
 
 	// Called when another command which requires one or more of the same
 	// subsystems is scheduled to run
 	protected void interrupted() {
+
 	}
 }

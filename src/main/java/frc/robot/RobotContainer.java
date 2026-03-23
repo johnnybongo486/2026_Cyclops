@@ -14,6 +14,7 @@ import frc.robot.commands.Shooter.AimToShootPoseOnly;
 import frc.robot.commands.Shooter.ContinuousSetShooterAndHood;
 import frc.robot.commands.Shooter.JoystickShooter;
 import frc.robot.commands.Shooter.SetShooterVelocity;
+import frc.robot.commands.Shooter.ShooterAdderCommand;
 import frc.robot.commands.Swerve.TeleopDrive;
 import frc.robot.generated.TunerConstants;
 import frc.robot.commands.Intake.JoystickIntakeWrist;
@@ -169,7 +170,7 @@ public class RobotContainer {
     // neutral mode is applied to the drive motors while disabled.
 
     // Shoot
-    driverController.rightBumper().whileTrue(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(0))));//2
+    driverController.rightBumper().whileTrue((new ShooterAdderCommand(7).withTimeout(0.25).andThen(new ShooterAdderCommand(0))).alongWith(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(0)))));//2
     driverController.rightBumper().onFalse(new StopUptake().alongWith(new RunIntakeAuto()).alongWith(new SlowAgitator().alongWith(new SetIntakeWristPosition(0))));  //6.25
 
     // drop intake
@@ -186,6 +187,9 @@ public class RobotContainer {
     driverController.leftBumper().onTrue(new RunIntakeAuto().alongWith(new SlowAgitator()));
     driverController.leftBumper().multiPress(2, 1).onTrue(new StopIntake().alongWith(new StopAgitator()));
 
+    // driver and operator override shooter adder
+    operatorController.a().and(driverController.rightBumper()).whileTrue(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(0))));
+
     // Operator Emergency Fix Intake Belt
     operatorController.x().whileTrue(new ReverseIntake());
     operatorController.x().onFalse(new StopIntake());
@@ -193,10 +197,22 @@ public class RobotContainer {
     operatorController.y().whileTrue(new RunIntake());
     operatorController.y().onFalse(new StopIntake());
 
-    operatorController.a().onTrue(new SetShooterVelocity(20));
-    operatorController.b().onTrue(new SetShooterVelocity(45));
+    // for testing
+    // operatorController.a().onTrue(new SetShooterVelocity(20));
+    // operatorController.b().onTrue(new SetShooterVelocity(41));
 
-  final var idle = new SwerveRequest.Idle();
+    // Operator Fixed Position Shooting
+    // bumpers on Hub, intake against ladders, side shoot from trenches
+    operatorController.rightTrigger().and(operatorController.a()).onTrue(new SetHoodPosition(Constants.Shooter.FixedShootHood.bumpers).alongWith(new SetShooterVelocity(Constants.Shooter.FixedShootSpeed.bumpers)));
+    operatorController.rightTrigger().and(operatorController.x()).onTrue(new SetHoodPosition(Constants.Shooter.FixedShootHood.ladder).alongWith(new SetShooterVelocity(Constants.Shooter.FixedShootSpeed.ladder)));
+    operatorController.rightTrigger().and(operatorController.b()).onTrue(new SetHoodPosition(Constants.Shooter.FixedShootHood.side).alongWith(new SetShooterVelocity(Constants.Shooter.FixedShootSpeed.side)));
+    
+    // reset after fixed shooting; or emergency hood to down position
+    operatorController.rightTrigger().and(operatorController.rightBumper()).onTrue(new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition));
+
+    
+    final var idle = new SwerveRequest.Idle();
+
     RobotModeTriggers.disabled().whileTrue(
       drivetrain.applyRequest(() -> idle).ignoringDisable(true)
     );

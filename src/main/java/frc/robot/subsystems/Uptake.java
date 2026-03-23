@@ -28,7 +28,7 @@ public class Uptake extends SubsystemBase {
         uptakeFXConfig.CurrentLimits.StatorCurrentLimit = 60;
 
         /* PID Config */
-        uptakeFXConfig.Slot0.kP = 1;
+        uptakeFXConfig.Slot0.kP = 1.0;
         uptakeFXConfig.Slot0.kI = 0;
         uptakeFXConfig.Slot0.kD = 0;
 

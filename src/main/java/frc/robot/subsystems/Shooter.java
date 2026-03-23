@@ -21,8 +21,9 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 	private boolean isHoldingVelocity = false;
 
 	// Set Different Speeds
-	private double zeroVelocity = 0;
-	private double maxVelocity = 100;
+	private double conversionFactor = 4096 / 600;
+	private double zeroVelocity = 0*conversionFactor;
+	private double maxVelocity = 5000*conversionFactor;
 
 	public final static int Shooter_PIDX = 0;
 
@@ -33,7 +34,9 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
     public double targetVelocity = 0;
 	private double arbitraryFeedForward = 0.0;
 
-	private final static double onTargetThreshold = 0.5;
+	private final static double onTargetThreshold = 0.01;
+
+	public double shooterAdder = 0;
 
 	public TalonFX leftShooterKraken = new TalonFX(DeviceIds.Shooter.LeadLeftMotorId, "canivore");
     public TalonFX leftShooterKrakenFollower = new TalonFX(DeviceIds.Shooter.FollowerLeftMotorId, "canivore");
@@ -60,22 +63,22 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 
 		// Current Limiting
 		shooterFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        shooterFXConfig.CurrentLimits.StatorCurrentLimit = 40;
+        shooterFXConfig.CurrentLimits.StatorCurrentLimit = 60;
 
         /* PID Config */
-        shooterFXConfig.Slot0.kP = 0.2; // 0.15
+        shooterFXConfig.Slot0.kP = 0.7; // 0.15
         shooterFXConfig.Slot0.kI = 0.0; // 0.01
-        shooterFXConfig.Slot0.kD = 0.01; // 0.15
+        shooterFXConfig.Slot0.kD = 0.5; // 0.15
 
         /* Open and Closed Loop Ramping */
         shooterFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.5;
         shooterFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.5;
 
-        shooterFXConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.125;
-        shooterFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.125;
+        shooterFXConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.225;
+        shooterFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.225;
 
 		// Velocity Feed Forward
-		shooterFXConfig.Slot0.kV = 0.01062*0.9; // 0.0113
+		shooterFXConfig.Slot0.kV = 0.01062; // 0.0113
 		shooterFXConfig.Slot0.kA = 0.0;
 		shooterFXConfig.Slot0.kS = 0.0018;// 0.021;
 		
@@ -83,8 +86,8 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 		targetVelocityDutyCycle.withEnableFOC(true);
 		
 		// Set Peak Torque Current
-		shooterFXConfig.TorqueCurrent.PeakForwardTorqueCurrent = 40;
-		shooterFXConfig.TorqueCurrent.PeakReverseTorqueCurrent = 40;
+		shooterFXConfig.TorqueCurrent.PeakForwardTorqueCurrent = 60;
+		shooterFXConfig.TorqueCurrent.PeakReverseTorqueCurrent = 60;
 
         // Config Motor
         leftShooterKraken.getConfigurator().apply(shooterFXConfig);
@@ -201,5 +204,13 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 		} else {
 			return false;
 		}
+	}
+
+	public void setShooterAdder(double adder) {
+		this.shooterAdder = adder;
+	}
+
+	public double getShooterAdder(){
+		return shooterAdder;
 	}
 }
