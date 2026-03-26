@@ -88,7 +88,6 @@ public class PoseEst extends SubsystemBase{
         LimelightHelpers.PoseEstimate mt2RightBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
         LimelightHelpers.PoseEstimate mt2ShooterBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shooter");
 
-
         //init rejects
         doRejectUpdateLeft = true; // falses
         doRejectUpdateRight = true; 
@@ -96,13 +95,13 @@ public class PoseEst extends SubsystemBase{
 
         if (alliance.isPresent()) {
 
-            if(/*mt2LeftBlue != null && mt2RightBlue != null &&*/ mt2ShooterBlue != null) { // make sure we have the camera        
+            if(mt2LeftBlue != null && mt2RightBlue != null && mt2ShooterBlue != null) { // make sure we have the camera        
                 if(Math.abs(RobotContainer.drivetrain.getPigeon2().getAngularVelocityZDevice().getValueAsDouble()) > 720) {// if our angular velocity is greater than 720 degrees per second, ignore vision updates
                     doRejectUpdateLeft = true;
                     doRejectUpdateRight = true;
                     doRejectUpdateShooter = true;
                 }
-                /* 
+                 
                 if(mt2LeftBlue.tagCount == 0) {
                     doRejectUpdateLeft = true;
                 }
@@ -114,7 +113,6 @@ public class PoseEst extends SubsystemBase{
                 }
 
                 else{}
-                */
 
                 if(mt2ShooterBlue.tagCount == 0) {
                     doRejectUpdateShooter = true;

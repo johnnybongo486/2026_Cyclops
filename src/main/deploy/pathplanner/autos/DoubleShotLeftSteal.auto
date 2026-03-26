@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Cyclops 1 Left"
+            "pathName": "DoubleShotLeftSteal1"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Cyclops 2 Left"
+            "pathName": "DoubleShotLeftSteal2"
           }
         }
       ]

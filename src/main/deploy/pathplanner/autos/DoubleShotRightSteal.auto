@@ -11,32 +11,19 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "AimToShoot8"
+                  "name": "LowerIntake"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "LowerIntake"
+                  "name": "AutoSetShooterAndHood"
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.5
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootCommand"
-                      }
-                    }
-                  ]
+                  "name": "RunIntake"
                 }
               }
             ]
@@ -49,19 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DoubleShotRightSteal - 1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "AutoAim"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "StopShoot"
+                  "pathName": "DoubleShotRightSteal1"
                 }
               }
             ]
@@ -72,9 +47,15 @@
           "data": {
             "commands": [
               {
+                "type": "wait",
+                "data": {
+                  "waitTime": 2.75
+                }
+              },
+              {
                 "type": "named",
                 "data": {
-                  "name": "AimToShoot20"
+                  "name": "AimToShoot"
                 }
               },
               {
@@ -106,13 +87,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "Copy of DoubleShotRightSteal - 2"
+                  "pathName": "DoubleShotRightSteal2"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "AutoAim"
+                  "name": "AutoSetShooterAndHood"
                 }
               },
               {
@@ -129,9 +110,15 @@
           "data": {
             "commands": [
               {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              },
+              {
                 "type": "named",
                 "data": {
-                  "name": "AimToShoot60"
+                  "name": "AimToShoot"
                 }
               },
               {

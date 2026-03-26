@@ -126,16 +126,18 @@ public class RobotContainer {
     registerNamedCommands();
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto settings");
-    autoChooser.addOption("CyclopsRight", new PathPlannerAuto("CyclopsRight"));
-    autoChooser.addOption("CyclopsTest", new PathPlannerAuto("CyclopsTest"));
+    autoChooser.addOption("DoubleShotRightSteal", new PathPlannerAuto("DoubleShotRightSteal"));
+    autoChooser.addOption("DoubleShotRightLose", new PathPlannerAuto("DoubleShotRightLose"));
+    autoChooser.addOption("DoubleShotRightSafe", new PathPlannerAuto("DoubleShotRightSafe"));
+    autoChooser.addOption("DoubleShotLeftSteal", new PathPlannerAuto("DoubleShotLeftSteal"));
 
     autoTab.add("Mode", autoChooser);
     
     // Set Default Commands
     uptake.setDefaultCommand(new StopUptake());
     agitator.setDefaultCommand(new StopAgitator());
-    //intake.setDefaultCommand(new StopIntake());
     intake.setDefaultCommand(new RunIntakeAuto());
+    hood.setDefaultCommand(new ContinuousSetShooterAndHood());
 
     
     drivetrain.setDefaultCommand(
@@ -148,9 +150,9 @@ public class RobotContainer {
     );
     
     // Joysticks Used for Tuning
-    hood.setDefaultCommand(new JoystickHood());
-    shooter.setDefaultCommand(new JoystickShooter());
-    //intakeWrist.setDefaultCommand(new JoystickIntakeWrist());
+    // hood.setDefaultCommand(new JoystickHood());
+    // shooter.setDefaultCommand(new JoystickShooter());
+    // intakeWrist.setDefaultCommand(new JoystickIntakeWrist());
 
     // Configure the trigger bindings
     configureBindings();      
@@ -170,14 +172,14 @@ public class RobotContainer {
     // neutral mode is applied to the drive motors while disabled.
 
     // Shoot
-    driverController.rightBumper().whileTrue((new ShooterAdderCommand(7).withTimeout(0.25).andThen(new ShooterAdderCommand(0))).alongWith(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(0)))));//2
-    driverController.rightBumper().onFalse(new StopUptake().alongWith(new RunIntakeAuto()).alongWith(new SlowAgitator().alongWith(new SetIntakeWristPosition(0))));  //6.25
+    driverController.rightBumper().whileTrue((new ShooterAdderCommand(Constants.Shooter.ShooterSpeed.ShooterAdder).withTimeout(0.25).andThen(new ShooterAdderCommand(0))).alongWith(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.squeeze)))));//2
+    driverController.rightBumper().onFalse(new StopUptake().alongWith(new RunIntakeAuto()).alongWith(new SlowAgitator().alongWith(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.RunIntakePosition))));  //6.25
 
     // drop intake
-    driverController.b().onTrue(new SetIntakeWristPosition(6.0));
+    driverController.b().onTrue(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.RunIntakePosition));
 
     // pick up intake
-    driverController.b().multiPress(2,1).onTrue(new SetIntakeWristPosition(0));
+    driverController.b().multiPress(2,1).onTrue(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.StoreIntakePosition));
 
     // aim using pose only
     driverController.leftTrigger().whileTrue(new AimToShootPoseOnly());
@@ -188,7 +190,7 @@ public class RobotContainer {
     driverController.leftBumper().multiPress(2, 1).onTrue(new StopIntake().alongWith(new StopAgitator()));
 
     // driver and operator override shooter adder
-    operatorController.a().and(driverController.rightBumper()).whileTrue(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(0))));
+    operatorController.a().and(driverController.rightBumper()).whileTrue(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.squeeze))));
 
     // Operator Emergency Fix Intake Belt
     operatorController.x().whileTrue(new ReverseIntake());
@@ -259,15 +261,10 @@ public class RobotContainer {
     public void registerNamedCommands() {
         /* Command registration for PathPlanner */     
         NamedCommands.registerCommand("LowerIntake", new AutoLowerIntake().withTimeout(0.1));
-        NamedCommands.registerCommand("RaiseIntake", new AutoRaiseIntake());
-        NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooterAndHood().withTimeout(0.1));
+        NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooterAndHood());
         NamedCommands.registerCommand("AimToShoot", new AimToShootPoseOnly());
-        NamedCommands.registerCommand("AimToShoot8", new AimToShootPoseOnly().withTimeout(1.25));
-        NamedCommands.registerCommand("AimToShoot20", new AimToShootPoseOnly().withTimeout(3));
-        NamedCommands.registerCommand("AimToShoot30", new AimToShootPoseOnly().withTimeout(4));
-        NamedCommands.registerCommand("AimToShoot60", new AimToShootPoseOnly().withTimeout(6));
-        NamedCommands.registerCommand("ShootCommand", new RunAgitator().alongWith(new RunUptake().alongWith(new RunIntake())));
-        NamedCommands.registerCommand("RunIntake", new RunIntake().alongWith(new SlowAgitator()));
-        NamedCommands.registerCommand("StopShoot", new StopUptake());
+        NamedCommands.registerCommand("ShootCommand", (new ShooterAdderCommand(Constants.Shooter.ShooterSpeed.ShooterAdder).withTimeout(0.25).andThen(new ShooterAdderCommand(0))).alongWith(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.squeeze)))));
+        NamedCommands.registerCommand("RunIntake", new RunIntake());
+        NamedCommands.registerCommand("StopShoot", new StopUptake().alongWith(new RunIntake()).alongWith(new SlowAgitator().alongWith(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.RunIntakePosition))));
     }
 }

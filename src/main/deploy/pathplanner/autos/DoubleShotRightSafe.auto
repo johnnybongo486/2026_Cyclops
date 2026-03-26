@@ -11,32 +11,19 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "AimToShoot8"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
                   "name": "LowerIntake"
                 }
               },
               {
-                "type": "sequential",
+                "type": "named",
                 "data": {
-                  "commands": [
-                    {
-                      "type": "wait",
-                      "data": {
-                        "waitTime": 0.5
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "ShootCommand"
-                      }
-                    }
-                  ]
+                  "name": "AutoSetShooterAndHood"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "RunIntake"
                 }
               }
             ]
@@ -49,19 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DoubleShotLeft - 1"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "AutoAim"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "StopShoot"
+                  "pathName": "DoubleShotRightSafe1"
                 }
               }
             ]
@@ -72,9 +47,15 @@
           "data": {
             "commands": [
               {
+                "type": "wait",
+                "data": {
+                  "waitTime": 2.75
+                }
+              },
+              {
                 "type": "named",
                 "data": {
-                  "name": "AimToShoot30"
+                  "name": "AimToShoot"
                 }
               },
               {
@@ -106,13 +87,13 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DoubleShotLeft - 2"
+                  "pathName": "DoubleShotRightSteal2"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "AutoAim"
+                  "name": "AutoSetShooterAndHood"
                 }
               },
               {
@@ -129,9 +110,15 @@
           "data": {
             "commands": [
               {
+                "type": "wait",
+                "data": {
+                  "waitTime": 5.0
+                }
+              },
+              {
                 "type": "named",
                 "data": {
-                  "name": "AimToShoot30"
+                  "name": "AimToShoot"
                 }
               },
               {
@@ -151,31 +138,6 @@
                       }
                     }
                   ]
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "deadline",
-          "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "DoubleShotLeft - 3"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "AutoAim"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "StopShoot"
                 }
               }
             ]

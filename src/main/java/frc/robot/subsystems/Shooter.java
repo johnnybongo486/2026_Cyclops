@@ -7,6 +7,7 @@ import frc.lib.models.*;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
@@ -29,7 +30,8 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 
 	public double maxVelocityLimit = maxVelocity;
 	public double lowVelocityLimit = 0;
-	private VelocityDutyCycle targetVelocityDutyCycle = new VelocityDutyCycle(0);
+	//private VelocityDutyCycle targetVelocityDutyCycle = new VelocityDutyCycle(0);
+	private VelocityVoltage targetVelocityDutyCycle = new VelocityVoltage(0);
 
     public double targetVelocity = 0;
 	private double arbitraryFeedForward = 0.0;
@@ -63,12 +65,12 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 
 		// Current Limiting
 		shooterFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        shooterFXConfig.CurrentLimits.StatorCurrentLimit = 60;
+        shooterFXConfig.CurrentLimits.StatorCurrentLimit = 40;
 
         /* PID Config */
-        shooterFXConfig.Slot0.kP = 0.7; // 0.15
-        shooterFXConfig.Slot0.kI = 0.0; // 0.01
-        shooterFXConfig.Slot0.kD = 0.5; // 0.15
+        shooterFXConfig.Slot0.kP = 0.75; // 0.7
+        shooterFXConfig.Slot0.kI = 0.0; // 0.0
+        shooterFXConfig.Slot0.kD = 0.0; // 0.5
 
         /* Open and Closed Loop Ramping */
         shooterFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.5;
@@ -78,16 +80,16 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
         shooterFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.225;
 
 		// Velocity Feed Forward
-		shooterFXConfig.Slot0.kV = 0.01062; // 0.0113
-		shooterFXConfig.Slot0.kA = 0.0;
-		shooterFXConfig.Slot0.kS = 0.0018;// 0.021;
+		shooterFXConfig.Slot0.kV = 0.125*0.95; // 0.01062
+		shooterFXConfig.Slot0.kA = 0.0;		// 0.0
+		shooterFXConfig.Slot0.kS = 0.25;	// 0.0018;
 		
 		// Enable FOC
 		targetVelocityDutyCycle.withEnableFOC(true);
 		
 		// Set Peak Torque Current
-		shooterFXConfig.TorqueCurrent.PeakForwardTorqueCurrent = 60;
-		shooterFXConfig.TorqueCurrent.PeakReverseTorqueCurrent = 60;
+		shooterFXConfig.TorqueCurrent.PeakForwardTorqueCurrent = 40;
+		shooterFXConfig.TorqueCurrent.PeakReverseTorqueCurrent = 40;
 
         // Config Motor
         leftShooterKraken.getConfigurator().apply(shooterFXConfig);
