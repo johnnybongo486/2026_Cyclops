@@ -6,7 +6,6 @@ import frc.lib.models.*;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -30,7 +29,6 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 
 	public double maxVelocityLimit = maxVelocity;
 	public double lowVelocityLimit = 0;
-	//private VelocityDutyCycle targetVelocityDutyCycle = new VelocityDutyCycle(0);
 	private VelocityVoltage targetVelocityDutyCycle = new VelocityVoltage(0);
 
     public double targetVelocity = 0;

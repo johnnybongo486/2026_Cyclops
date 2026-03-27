@@ -2,7 +2,6 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Auto.AutoLowerIntake;
-import frc.robot.commands.Auto.AutoRaiseIntake;
 import frc.robot.commands.Hood.JoystickHood;
 import frc.robot.commands.Hood.SetHoodPosition;
 import frc.robot.commands.Serializer.StopUptake;
@@ -130,6 +129,8 @@ public class RobotContainer {
     autoChooser.addOption("DoubleShotRightLose", new PathPlannerAuto("DoubleShotRightLose"));
     autoChooser.addOption("DoubleShotRightSafe", new PathPlannerAuto("DoubleShotRightSafe"));
     autoChooser.addOption("DoubleShotLeftSteal", new PathPlannerAuto("DoubleShotLeftSteal"));
+    autoChooser.addOption("DoubleShotLeftSafe", new PathPlannerAuto("DoubleShotLeftSafe"));
+    autoChooser.addOption("DoubleShotLeftLose", new PathPlannerAuto("DoubleShotLeftLose"));
 
     autoTab.add("Mode", autoChooser);
     
@@ -138,6 +139,7 @@ public class RobotContainer {
     agitator.setDefaultCommand(new StopAgitator());
     intake.setDefaultCommand(new RunIntakeAuto());
     hood.setDefaultCommand(new ContinuousSetShooterAndHood());
+    //intake.setDefaultCommand(new StopIntake());
 
     
     drivetrain.setDefaultCommand(
@@ -197,7 +199,7 @@ public class RobotContainer {
     operatorController.x().onFalse(new StopIntake());
 
     operatorController.y().whileTrue(new RunIntake());
-    operatorController.y().onFalse(new StopIntake());
+    operatorController.y().onFalse(new RunIntakeAuto());
 
     // for testing
     // operatorController.a().onTrue(new SetShooterVelocity(20));
