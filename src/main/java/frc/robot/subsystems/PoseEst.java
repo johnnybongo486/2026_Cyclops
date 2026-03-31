@@ -13,13 +13,14 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.LimelightHelpers;
-import frc.robot.Robot;
 import frc.robot.RobotContainer;
 
 public class PoseEst extends SubsystemBase{
 
     public boolean doRejectUpdateLeft = false;
     public boolean doRejectUpdateRight = false;
+    public boolean doRejectUpdateShooter = false;
+
     public boolean isPresent = false;
     private double theta = 0.0;
     private double robotAngle = 0.0;
@@ -43,6 +44,7 @@ public class PoseEst extends SubsystemBase{
 
     private boolean passingMode = true;
     private boolean isSafe = true;
+    private boolean isSafeIntake = true;
     private GenericEntry startingPose;
     private boolean isShooting = false;
     private String shoot = "DO NOTHING";
@@ -56,11 +58,18 @@ public class PoseEst extends SubsystemBase{
     private double time;
     private double timeLeft;
     private boolean rejectLL;
-    private double safeMin;
-    private double safeMax;
+    private double safeMinR;
+    private double safeMaxR;
+    private double safeMinB;
+    private double safeMaxB;
+    private double safeMinIntakeR;
+    private double safeMaxIntakeR;
+    private double safeMinIntakeB;
+    private double safeMaxIntakeB;
 
-
-    public Optional<Alliance> alliance = DriverStation.getAlliance();
+    // Refreshed each loop in updatePose() — do not cache at construction time since FMS
+    // may not have set the alliance yet when robot code first starts.
+    public Optional<Alliance> alliance = Optional.empty();
 
     public PoseEst(){
         RobotContainer.drivetrain.getPigeon2().setYaw(0);
@@ -69,59 +78,63 @@ public class PoseEst extends SubsystemBase{
             .add("Robot Facing Blue Driver Station?", false) // Initial value
             .withWidget("Toggle Button") // Makes it interactive
             .getEntry();
-        //LimelightHelpers.SetRobotOrientation("limelight-left", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
-        //LimelightHelpers.SetRobotOrientation("limelight-right", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
     }
 
     public void updatePose() {
+        // Refresh alliance every loop so it's never stale from pre-FMS-connect startup
+        alliance = DriverStation.getAlliance();
+
         //Send data to LL
         LimelightHelpers.SetRobotOrientation("limelight-right", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
         LimelightHelpers.SetRobotOrientation("limelight-left", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation("limelight-shooter", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
         
         //Pull relative tag location
         LimelightHelpers.PoseEstimate mt2LeftBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
         LimelightHelpers.PoseEstimate mt2RightBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
+        LimelightHelpers.PoseEstimate mt2ShooterBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shooter");
 
         //init rejects
-        doRejectUpdateLeft = false;
-        doRejectUpdateRight = false; 
+        doRejectUpdateLeft = true; // falses
+        doRejectUpdateRight = true; 
+        doRejectUpdateShooter = false;
 
         if (alliance.isPresent()) {
 
-            if(mt2LeftBlue != null && mt2RightBlue != null) { // make sure we have the camera        
+            if(mt2LeftBlue != null && mt2RightBlue != null && mt2ShooterBlue != null) { // make sure we have the camera        
                 if(Math.abs(RobotContainer.drivetrain.getPigeon2().getAngularVelocityZDevice().getValueAsDouble()) > 720) {// if our angular velocity is greater than 720 degrees per second, ignore vision updates
                     doRejectUpdateLeft = true;
                     doRejectUpdateRight = true;
+                    doRejectUpdateShooter = true;
                 }
-                
+                 
                 if(mt2LeftBlue.tagCount == 0) {
                     doRejectUpdateLeft = true;
                 }
 
+                else{}
+
                 if(mt2RightBlue.tagCount == 0) {
                     doRejectUpdateRight = true;
                 }
-                
-                // use this if one LL works
-                if( mt2LeftBlue.tagCount != 0 && mt2RightBlue.tagCount != 0 && Robot.robotContainer.driverController.leftTrigger().getAsBoolean() == true) {
-                //if (Robot.robotContainer.driverController.leftTrigger().getAsBoolean() == true) {  // use this if no limelights
-                    doRejectUpdateLeft = true;
-                    //doRejectUpdateRight = true;
-                    rejectLL = true;
-                }
-                
-                else {
-                    rejectLL = false;
-                }
 
-                
-            
+                else{}
+
+                if(mt2ShooterBlue.tagCount == 0) {
+                    doRejectUpdateShooter = true;
+                }
+                else{}
+
                 if(!doRejectUpdateLeft) {
                     RobotContainer.drivetrain.addVisionMeasurement(mt2LeftBlue.pose, mt2LeftBlue.timestampSeconds, VecBuilder.fill(0.7,0.7,99999)); // n1: 0.7
                 }
 
                 if(!doRejectUpdateRight) {
                     RobotContainer.drivetrain.addVisionMeasurement(mt2RightBlue.pose, mt2RightBlue.timestampSeconds, VecBuilder.fill(0.7,0.7,99999)); // n1: 0.7
+                }
+
+                if(!doRejectUpdateShooter) {
+                    RobotContainer.drivetrain.addVisionMeasurement(mt2ShooterBlue.pose, mt2ShooterBlue.timestampSeconds, VecBuilder.fill(0.7,0.7,99999)); // n1: 0.7
                 }
             } 
             
@@ -245,34 +258,49 @@ public class PoseEst extends SubsystemBase{
     public boolean getIsSafe(){
 
         Pose2d currentPose = RobotContainer.drivetrain.getState().Pose;
-        double currentVelocity = RobotContainer.turret.getXSpeed();
+        double currentVelocity = RobotContainer.drivetrain.getXSpeed();
 
         if (DriverStation.getAlliance().isPresent() == true) {
 
-            if (alliance.get() == Alliance.Red) {
+            //if (alliance.get() == Alliance.Red) {
                 
                 // Check current velocity and set safe zone
                 if (Math.abs(currentVelocity) > 3) {
-                    safeMin = 10.1;
-                    safeMax = 13.5;
+                    safeMinR= 10.1;
+                    safeMaxR = 13.5;
+                    safeMinB = 2.8;
+                    safeMaxB = 6.8;
                 }
 
                 else if (Math.abs(currentVelocity) > 1 && Math.abs(currentVelocity) <= 3 ) {
-                    safeMin = 10.6;
-                    safeMax = 13;
+                    safeMinR = 10.6;
+                    safeMaxR = 13;
+                    safeMinB = 3.3;
+                    safeMaxB = 6.3;
                 }
 
                 else if (Math.abs(currentVelocity) >= 0 && Math.abs(currentVelocity) <= 1 ) {
-                    safeMin = 11.1;
-                    safeMax = 12.5;
+                    safeMinR = 11.1;
+                    safeMaxR = 12.5;
+                    safeMinB = 4.0;
+                    safeMaxB = 5.3;
                 }
 
-                else{
+                else {
 
                 }
+
+
 
                 // Set Min Max based on velocity
-                if (currentPose.getX() >= safeMin && currentPose.getX() <= safeMax) {
+                if (currentPose.getX() >= safeMinR && currentPose.getX() <= safeMaxR) {
+                    isSafe = false;
+
+                    // save where the hood was prior to entering the danger zone
+                    prevHoodPos = RobotContainer.hood.getCurrentPosition();
+                }
+
+                else if (currentPose.getX() >= safeMinB && currentPose.getX() <= safeMaxB) {
                     isSafe = false;
 
                     // save where the hood was prior to entering the danger zone
@@ -289,23 +317,23 @@ public class PoseEst extends SubsystemBase{
 
                     isSafe = true;
                 }
-            }
+            //}
 
-            else {
+            /*else {
                 // Check current velocity and set safe zone
                 if (Math.abs(currentVelocity) > 3) {
-                    safeMin = 2.8;
-                    safeMax = 6.8;
+                    safeMinB = 2.8;
+                    safeMaxB = 6.8;
                 }
 
                 else if (Math.abs(currentVelocity) > 1 && Math.abs(currentVelocity) <= 3 ) {
-                    safeMin = 3.3;
-                    safeMax = 6.3;
+                    safeMinB = 3.3;
+                    safeMaxB = 6.3;
                 }
 
                 else if (Math.abs(currentVelocity) >= 0 && Math.abs(currentVelocity) <= 1 ) {
-                    safeMin = 4.0;
-                    safeMax = 5.3;
+                    safeMinB = 4.0;
+                    safeMaxB = 5.3;
                 }
 
                 else{
@@ -313,7 +341,7 @@ public class PoseEst extends SubsystemBase{
                 }
 
                 // Set Min Max based on velocity
-                if (currentPose.getX() >= safeMin && currentPose.getX() <= safeMax) { // 4.0, 5.3
+                if (currentPose.getX() >= safeMinB && currentPose.getX() <= safeMaxB) { // 4.0, 5.3
                     isSafe = false;
 
                     // save where the hood was prior to entering the danger zone
@@ -328,9 +356,93 @@ public class PoseEst extends SubsystemBase{
                     }
 
                     isSafe = true;
+                } */
+            //}
+            return isSafe;   
+        }
+
+        else {
+            return false;
+        }
+    }
+
+    public boolean getIsSafeIntake(){
+
+        Pose2d currentPose = RobotContainer.drivetrain.getState().Pose;
+        double currentVelocity = RobotContainer.drivetrain.getXSpeed();
+
+        if (DriverStation.getAlliance().isPresent() == true) {
+
+            //if (alliance.get() == Alliance.Red) {
+                
+                // Check current velocity and set safe zone
+                if (Math.abs(currentVelocity) > 1) {
+                    safeMinIntakeR = 11.1;
+                    safeMaxIntakeR = 12.5;
+                    safeMinIntakeB = 4.0;
+                    safeMaxIntakeB = 5.3;
+                }
+
+                else if (Math.abs(currentVelocity) >= 0 && Math.abs(currentVelocity) <= 1 ) {
+                    safeMinIntakeR = 11.89;
+                    safeMaxIntakeR = 11.9;
+                    safeMinIntakeB = 4.79;
+                    safeMaxIntakeB = 4.8;
+                }
+
+                else {
+
+                }
+
+                // Set Min Max based on velocity
+                if (currentPose.getX() >= safeMinIntakeR && currentPose.getX() <= safeMaxIntakeR) {
+                    isSafeIntake = false;
+                }
+
+                else if (currentPose.getX() >= safeMinIntakeB && currentPose.getX() <= safeMaxIntakeB) {
+                    isSafeIntake = false;
+                }
+
+
+                else {
+                    if(isSafeIntake == false) {
+
+                    }
+
+                    isSafeIntake = true;
+                }
+            /*} 
+            else {
+                // Check current velocity and set safe zone
+                if (Math.abs(currentVelocity) > 2) {
+                    safeMinIntakeB = 4.0;
+                    safeMaxIntakeB = 5.3;
+                }
+
+                else if (Math.abs(currentVelocity) >= 0 && Math.abs(currentVelocity) <= 2 ) {
+                    safeMinIntakeB = 4.79;
+                    safeMaxIntakeB = 4.8;
+                }
+
+                else{
+
+                }
+
+                // Set Min Max based on velocity
+                if (currentPose.getX() >= safeMinIntakeB && currentPose.getX() <= safeMaxIntakeB) { 
+                    isSafeIntake = false;
+                }
+                else {
+                    if(isSafeIntake == false) {
+
+                    }
+
+                    isSafeIntake = true;
                 } 
             }
-            return isSafe;   
+*/
+            
+            return isSafeIntake;   
         }
 
         else {
@@ -344,28 +456,34 @@ public class PoseEst extends SubsystemBase{
         double xR = currentPose.getX();
         double yR = currentPose.getY();
 
+        // Read passing mode fresh here — avoids depending on the caller having called
+        // getPassingMode() first to update the stale passingMode field.
+        boolean currentlyPassing = getPassingMode();
+
         if (DriverStation.getAlliance().isPresent() == true) {
-        
-            if (DriverStation.getAlliance().get() == Alliance.Red){  // added passing mode!
-                if (passingMode == false) {
+
+            if (DriverStation.getAlliance().get() == Alliance.Red) {
+                if (!currentlyPassing) {
                     xH = targetHubPoseRed.getX();
                     yH = targetHubPoseRed.getY();
-                }
-                
-                else {
+                } else if (currentPose.getY() >= 4) {
                     xH = targetHPSPassPoseRed.getX();
                     yH = targetHPSPassPoseRed.getY();
+                } else {
+                    xH = targetDepotPassPoseRed.getX();
+                    yH = targetDepotPassPoseRed.getY();
                 }
             }
             else {
-                if (passingMode == false) {
+                if (!currentlyPassing) {
                     xH = targetHubPoseBlue.getX();
                     yH = targetHubPoseBlue.getY();
-                }
-                
-                else {
+                } else if (currentPose.getY() <= 4) {
                     xH = targetHPSPassPoseBlue.getX();
                     yH = targetHPSPassPoseBlue.getY();
+                } else {
+                    xH = targetDepotPassPoseBlue.getX();
+                    yH = targetDepotPassPoseBlue.getY();
                 }
             }
 
@@ -487,6 +605,7 @@ public class PoseEst extends SubsystemBase{
         SmartDashboard.putNumber("ROBOTANGLE", robotAngle); 
         SmartDashboard.putBoolean("Passing Mode", getPassingMode());
         SmartDashboard.putBoolean("Is Safe", getIsSafe());
+        SmartDashboard.putBoolean("Is Safe to Intake", getIsSafeIntake());
         SmartDashboard.putNumber("Distance", distanceTarget());
         SmartDashboard.putBoolean("Robot Facing Blue Driver Station", getStartingPose());
         SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());

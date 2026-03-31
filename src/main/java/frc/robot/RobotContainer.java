@@ -2,42 +2,32 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Auto.AutoLowerIntake;
-import frc.robot.commands.Auto.AutoRaiseIntake;
-import frc.robot.commands.CANdle.SetColorFlow;
 import frc.robot.commands.Hood.JoystickHood;
 import frc.robot.commands.Hood.SetHoodPosition;
 import frc.robot.commands.Serializer.StopUptake;
 import frc.robot.commands.Serializer.RunAgitator;
-import frc.robot.commands.Serializer.RunDrum;
 import frc.robot.commands.Serializer.RunUptake;
 import frc.robot.commands.Serializer.SlowAgitator;
 import frc.robot.commands.Serializer.StopAgitator;
-import frc.robot.commands.Serializer.StopDrum;
+import frc.robot.commands.Shooter.AimToShootPoseOnly;
+import frc.robot.commands.Shooter.ContinuousSetShooterAndHood;
 import frc.robot.commands.Shooter.JoystickShooter;
 import frc.robot.commands.Shooter.SetShooterVelocity;
+import frc.robot.commands.Shooter.ShooterAdderCommand;
 import frc.robot.commands.Swerve.TeleopDrive;
-import frc.robot.commands.Turret.AimToShootPoseOnly;
-import frc.robot.commands.Turret.AutoAimPose;
-import frc.robot.commands.Turret.ContinuousSetShooterAndHood;
-import frc.robot.commands.Turret.JoystickTurret;
-import frc.robot.commands.Turret.SetTurretPosition;
-import frc.robot.commands.Turret.ZeroTurret;
-import frc.robot.dashboard.AutoAimDashboard;
 import frc.robot.generated.TunerConstants;
 import frc.robot.commands.Intake.JoystickIntakeWrist;
 import frc.robot.commands.Intake.ReverseIntake;
 import frc.robot.commands.Intake.RunIntake;
+import frc.robot.commands.Intake.RunIntakeAuto;
+import frc.robot.commands.Intake.RunIntakeSlow;
 import frc.robot.commands.Intake.SetIntakeWristPosition;
 import frc.robot.commands.Intake.StopIntake;
 import frc.robot.subsystems.Hood;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.ShooterLimelight;
-import frc.robot.subsystems.Turret;
 import frc.robot.subsystems.Uptake;
-import frc.robot.subsystems.Drum;
 import frc.robot.subsystems.Agitator;
-import frc.robot.subsystems.CANdleSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeWrist;
 import frc.robot.subsystems.PoseEst;
@@ -47,15 +37,13 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-
 import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -75,11 +63,33 @@ public class RobotContainer {
   private final int rotationAxis = XboxController.Axis.kRightX.value;
 
   /* Setting up bindings for necessary control of the swerve drive platform */
+  // No velocity-level deadband here — TeleopDrive already applies a 5% stick deadband via
+  // MathUtil.applyDeadband before scaling to m/s. A second deadband here compounded to ~15%
+  // stick deflection before the robot moved.
   private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-    .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
     .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+
+  /**
+   * PROTOTYPE MODE — used by AutoAimPose and AimToShootPoseOnly to rotate the whole
+   * robot toward the aiming target instead of moving the (non-existent) turret motor.
+   *
+   * Heading controller starting gains (tune on the practice field):
+   *   kP = 5.0  (rad/s per rad error — increase if rotation is sluggish)
+   *   kI = 0.0
+   *   kD = 0.05 (increase slightly if it overshoots)
+   *
+   * Note: the physical turret used kP=0.8, kI=0, kD=0.01 in duty_cycle/encoder-rotation
+   * units, which do not map numerically to the heading controller's rad/s per rad units.
+   *
+   * To restore the physical turret: comment out the drivetrain requirement in AutoAimPose
+   * and AimToShootPoseOnly, uncomment turretKraken.setControl() in Turret.positionControl(),
+   * and remove this field.
+   */
+  public static final SwerveRequest.FieldCentricFacingAngle facingAngle =
+      new SwerveRequest.FieldCentricFacingAngle()
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -88,16 +98,12 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public static Shooter shooter = new Shooter(); 
   public static Hood hood = new Hood();
-  public static Turret turret = new Turret();
   public static Uptake uptake = new Uptake();
-  public static Drum drum = new Drum();
   public static Agitator agitator = new Agitator();
   public static IntakeWrist intakeWrist = new IntakeWrist();
   public static Intake intake = new Intake();
-  public static ShooterLimelight shooterLimelight = new ShooterLimelight();
   public static PoseEst poseEst = new PoseEst();
   public static PoseLimelight poseLimelight = new PoseLimelight();
-  public static CANdleSubsystem caNdleSubsystem = new CANdleSubsystem();
 
   /* Path follower */
   private SendableChooser<Command> autoChooser = new SendableChooser<>();
@@ -111,30 +117,31 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    // PROTOTYPE MODE: configure heading controller for turret-to-drivetrain redirect.
+    // Tune kP first (raise until rotation tracks quickly without oscillating), then add kD.
+    facingAngle.HeadingController.setPID(5.0, 0.0, 0.05);
+    facingAngle.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
+
     registerNamedCommands();
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto settings");
-    autoChooser.addOption("MidPassRight", new PathPlannerAuto("MidPassRight"));
-    autoChooser.addOption("MidPassLeft", new PathPlannerAuto("MidPassLeft"));
-    autoChooser.addOption("DoubleShotRight", new PathPlannerAuto("DoubleShotRight"));
     autoChooser.addOption("DoubleShotRightSteal", new PathPlannerAuto("DoubleShotRightSteal"));
-    autoChooser.addOption("DoubleShotLeft", new PathPlannerAuto("DoubleShotLeft"));
-    autoChooser.addOption("DoubleShotLeftDepot", new PathPlannerAuto("DoubleShotLeftDepot"));
-    autoChooser.addOption("Depot", new PathPlannerAuto("Depot"));
-    
+    autoChooser.addOption("DoubleShotRightLose", new PathPlannerAuto("DoubleShotRightLose"));
+    autoChooser.addOption("DoubleShotRightSafe", new PathPlannerAuto("DoubleShotRightSafe"));
+    autoChooser.addOption("DoubleShotLeftSteal", new PathPlannerAuto("DoubleShotLeftSteal"));
+    autoChooser.addOption("DoubleShotLeftSafe", new PathPlannerAuto("DoubleShotLeftSafe"));
+    autoChooser.addOption("DoubleShotLeftLose", new PathPlannerAuto("DoubleShotLeftLose"));
+
     autoTab.add("Mode", autoChooser);
     
     // Set Default Commands
     uptake.setDefaultCommand(new StopUptake());
-    drum.setDefaultCommand(new StopDrum());
-    //agitator.setDefaultCommand(new StopAgitator());
+    agitator.setDefaultCommand(new StopAgitator());
+    intake.setDefaultCommand(new RunIntakeAuto());
+    hood.setDefaultCommand(new ContinuousSetShooterAndHood());
     //intake.setDefaultCommand(new StopIntake());
 
-    // Choose a default turret command
-    // turret.setDefaultCommand(new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));  // use only for matches
-    turret.setDefaultCommand(new SetTurretPosition(0));  // stop turret when starting 
-    //turret.setDefaultCommand(new JoystickTurret());
-
+    
     drivetrain.setDefaultCommand(
       new TeleopDrive(drivetrain,
       drive,
@@ -145,15 +152,12 @@ public class RobotContainer {
     );
     
     // Joysticks Used for Tuning
-    //hood.setDefaultCommand(new JoystickHood());
-    //shooter.setDefaultCommand(new JoystickShooter());
-    //intakeWrist.setDefaultCommand(new JoystickIntakeWrist());
+    // hood.setDefaultCommand(new JoystickHood());
+    // shooter.setDefaultCommand(new JoystickShooter());
+    // intakeWrist.setDefaultCommand(new JoystickIntakeWrist());
 
     // Configure the trigger bindings
-    configureBindings();
-
-    AutoAimDashboard.AddDashboard();
-      
+    configureBindings();      
     }
 
   /**
@@ -170,40 +174,51 @@ public class RobotContainer {
     // neutral mode is applied to the drive motors while disabled.
 
     // Shoot
-    driverController.rightBumper().whileTrue(new RunAgitator().alongWith(new RunDrum().alongWith(new RunUptake().alongWith(new RunIntake().alongWith(new SetColorFlow())))));
-    driverController.rightBumper().onFalse(new StopDrum().alongWith(new StopUptake().alongWith(new SlowAgitator())));
+    driverController.rightBumper().whileTrue((new ShooterAdderCommand(Constants.Shooter.ShooterSpeed.ShooterAdder).withTimeout(0.25).andThen(new ShooterAdderCommand(0))).alongWith(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.squeeze)))));//2
+    driverController.rightBumper().onFalse(new StopUptake().alongWith(new RunIntakeAuto()).alongWith(new SlowAgitator().alongWith(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.RunIntakePosition))));  //6.25
 
-    //drop intake
-    driverController.b().onTrue(new SetIntakeWristPosition(5.15));
+    // drop intake
+    driverController.b().onTrue(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.RunIntakePosition));
 
     // pick up intake
-    driverController.b().multiPress(2,1).onTrue(new SetIntakeWristPosition(0));
+    driverController.b().multiPress(2,1).onTrue(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.StoreIntakePosition));
 
-    // shoot using pose only
+    // aim using pose only
     driverController.leftTrigger().whileTrue(new AimToShootPoseOnly());
-    // driverController.leftTrigger().onFalse(new AutoAimPose());
-    driverController.leftTrigger().onFalse(new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));
-
-    // shoot using turret camera; use in case the pose is sad
-    // driverController.rightTrigger().onFalse(new AutoAimPose());
-    driverController.rightTrigger().onFalse(new AutoAimPose().alongWith(new SetHoodPosition(0)));
+    driverController.leftTrigger().onFalse(new ContinuousSetShooterAndHood());
 
     //intake
-    driverController.leftBumper().onTrue(new RunIntake().alongWith(new SlowAgitator()));
+    driverController.leftBumper().onTrue(new RunIntakeAuto().alongWith(new SlowAgitator()));
     driverController.leftBumper().multiPress(2, 1).onTrue(new StopIntake().alongWith(new StopAgitator()));
-    //driverController.leftBumper().multiPress(2, 1).onTrue(new StopIntake().alongWith(new StopAgitator()).alongWith(new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition)).alongWith(new SetShooterVelocity((0))));
-  
-    // Operator Take Control of Turret (also Emergency Disable Turret)
-    operatorController.leftTrigger().whileTrue(new JoystickTurret());
 
-    // Operator Rezero
-    operatorController.leftTrigger().and(operatorController.a().onTrue(new ZeroTurret()));
+    // driver and operator override shooter adder
+    operatorController.a().and(driverController.rightBumper()).whileTrue(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.squeeze))));
 
     // Operator Emergency Fix Intake Belt
     operatorController.x().whileTrue(new ReverseIntake());
-    operatorController.x().onFalse(new RunIntake());
+    operatorController.x().onFalse(new RunIntakeAuto());
 
-  final var idle = new SwerveRequest.Idle();
+    operatorController.y().whileTrue(new RunIntake());
+    operatorController.y().onFalse(new RunIntakeAuto());
+
+    // for testing
+    // operatorController.a().onTrue(new SetShooterVelocity(20));
+    // operatorController.b().onTrue(new SetShooterVelocity(41));
+
+    // Operator Fixed Position Shooting
+    // bumpers on Hub, intake against ladders, side shoot from trenches
+    operatorController.rightTrigger().and(operatorController.a()).whileTrue(new SetHoodPosition(Constants.Shooter.FixedShootHood.bumpers).alongWith(new SetShooterVelocity(Constants.Shooter.FixedShootSpeed.bumpers)));
+    operatorController.rightTrigger().and(operatorController.x()).whileTrue(new SetHoodPosition(Constants.Shooter.FixedShootHood.ladder).alongWith(new SetShooterVelocity(Constants.Shooter.FixedShootSpeed.ladder)));
+    operatorController.rightTrigger().and(operatorController.b()).whileTrue(new SetHoodPosition(Constants.Shooter.FixedShootHood.side).alongWith(new SetShooterVelocity(Constants.Shooter.FixedShootSpeed.side)));
+    
+    // reset after fixed shooting; or emergency hood to down position
+    operatorController.rightTrigger().and(operatorController.a()).onFalse(new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition));
+    operatorController.rightTrigger().and(operatorController.x()).onFalse(new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition));
+    operatorController.rightTrigger().and(operatorController.b()).onFalse(new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition));
+
+    
+    final var idle = new SwerveRequest.Idle();
+
     RobotModeTriggers.disabled().whileTrue(
       drivetrain.applyRequest(() -> idle).ignoringDisable(true)
     );
@@ -249,17 +264,11 @@ public class RobotContainer {
 
     public void registerNamedCommands() {
         /* Command registration for PathPlanner */     
-        NamedCommands.registerCommand("LowerIntake", new AutoLowerIntake());
-        NamedCommands.registerCommand("RaiseIntake", new AutoRaiseIntake());
-        NamedCommands.registerCommand("AutoAim", new AutoAimPose().alongWith(new ContinuousSetShooterAndHood()));
+        NamedCommands.registerCommand("LowerIntake", new AutoLowerIntake().withTimeout(0.01));
+        NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooterAndHood());
         NamedCommands.registerCommand("AimToShoot", new AimToShootPoseOnly());
-        NamedCommands.registerCommand("AimToShoot8", new AimToShootPoseOnly().withTimeout(1.25));
-        NamedCommands.registerCommand("AimToShoot20", new AimToShootPoseOnly().withTimeout(3));
-        NamedCommands.registerCommand("AimToShoot30", new AimToShootPoseOnly().withTimeout(4));
-        NamedCommands.registerCommand("AimToShoot60", new AimToShootPoseOnly().withTimeout(6));
-        NamedCommands.registerCommand("ShootCommand", new RunAgitator().alongWith(new RunDrum().alongWith(new RunUptake().alongWith(new RunIntake()))));
-        NamedCommands.registerCommand("RunIntake", new RunIntake().alongWith(new SlowAgitator()));
-        NamedCommands.registerCommand("StopPass", new SetHoodPosition(0).andThen(new AutoAimPose()));
-        NamedCommands.registerCommand("StopShoot", new StopDrum().alongWith(new StopUptake()));
+        NamedCommands.registerCommand("ShootCommand", (new ShooterAdderCommand(Constants.Shooter.ShooterSpeed.ShooterAdder).withTimeout(0.25).andThen(new ShooterAdderCommand(0))).alongWith(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.squeeze)))));
+        NamedCommands.registerCommand("RunIntake", new RunIntake());
+        NamedCommands.registerCommand("StopShoot", new StopUptake().alongWith(new RunIntake()).alongWith(new SlowAgitator().alongWith(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.RunIntakePosition))));
     }
 }
