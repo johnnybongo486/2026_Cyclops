@@ -50,7 +50,7 @@ public final class Constants {
     public static class ShooterSpeed {
       public static double a = 0.31429744138369126;
       public static double b = 0.99819972029013271;
-      public static double c = 37.004054363263093;  // 37.404054363263093
+      public static double c = 37.204054363263093;  // 37.404054363263093
       public static double ShooterAdder = 3.0;
     }
     public static class ShooterPassing {
@@ -61,21 +61,21 @@ public final class Constants {
     // Estimated projectile speed in m/s — used to compute time-of-flight for lead angle.
     // Tune by shooting from a known distance at known robot speed and adjusting until shots land.
     public static class ProjectileSpeed {
-      public static double metersPerSecond = 2.5;
+      public static double metersPerSecond = 2.3;
     }
 
     // Fixed Position Hood Positions
     public static class FixedShootHood {
-      public static double bumpers = 0.0;
-      public static double ladder = 5.06;
-      public static double side = 5.06;
+      public static double bumpers = 0.49;
+      public static double ladder = 8.15;
+      public static double side = 5.2;
     }
 
     // Fixed Position Shooter Speeds
     public static class FixedShootSpeed {
-      public static double bumpers = 38.0;
+      public static double bumpers = 39.0;
       public static double ladder = 43.5;
-      public static double side = 46;
+      public static double side = 41;
     }
   }
 

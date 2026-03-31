@@ -196,7 +196,7 @@ public class RobotContainer {
 
     // Operator Emergency Fix Intake Belt
     operatorController.x().whileTrue(new ReverseIntake());
-    operatorController.x().onFalse(new StopIntake());
+    operatorController.x().onFalse(new RunIntakeAuto());
 
     operatorController.y().whileTrue(new RunIntake());
     operatorController.y().onFalse(new RunIntakeAuto());
@@ -207,12 +207,14 @@ public class RobotContainer {
 
     // Operator Fixed Position Shooting
     // bumpers on Hub, intake against ladders, side shoot from trenches
-    operatorController.rightTrigger().and(operatorController.a()).onTrue(new SetHoodPosition(Constants.Shooter.FixedShootHood.bumpers).alongWith(new SetShooterVelocity(Constants.Shooter.FixedShootSpeed.bumpers)));
-    operatorController.rightTrigger().and(operatorController.x()).onTrue(new SetHoodPosition(Constants.Shooter.FixedShootHood.ladder).alongWith(new SetShooterVelocity(Constants.Shooter.FixedShootSpeed.ladder)));
-    operatorController.rightTrigger().and(operatorController.b()).onTrue(new SetHoodPosition(Constants.Shooter.FixedShootHood.side).alongWith(new SetShooterVelocity(Constants.Shooter.FixedShootSpeed.side)));
+    operatorController.rightTrigger().and(operatorController.a()).whileTrue(new SetHoodPosition(Constants.Shooter.FixedShootHood.bumpers).alongWith(new SetShooterVelocity(Constants.Shooter.FixedShootSpeed.bumpers)));
+    operatorController.rightTrigger().and(operatorController.x()).whileTrue(new SetHoodPosition(Constants.Shooter.FixedShootHood.ladder).alongWith(new SetShooterVelocity(Constants.Shooter.FixedShootSpeed.ladder)));
+    operatorController.rightTrigger().and(operatorController.b()).whileTrue(new SetHoodPosition(Constants.Shooter.FixedShootHood.side).alongWith(new SetShooterVelocity(Constants.Shooter.FixedShootSpeed.side)));
     
     // reset after fixed shooting; or emergency hood to down position
-    operatorController.rightTrigger().and(operatorController.rightBumper()).onTrue(new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition));
+    operatorController.rightTrigger().and(operatorController.a()).onFalse(new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition));
+    operatorController.rightTrigger().and(operatorController.x()).onFalse(new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition));
+    operatorController.rightTrigger().and(operatorController.b()).onFalse(new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition));
 
     
     final var idle = new SwerveRequest.Idle();

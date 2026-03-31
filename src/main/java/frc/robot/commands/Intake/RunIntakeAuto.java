@@ -18,8 +18,15 @@ public class RunIntakeAuto extends Command {
 	// Called repeatedly when this Command is scheduled to run
 	public void execute() {
 		if (RobotContainer.drivetrain.getState().Speeds.vxMetersPerSecond < -0.1) {
-        	RobotContainer.intake.setSpeed(Constants.Intake.IntakeRoller.IntakeRunSpeed);
+			if (RobotContainer.poseEst.getIsSafeIntake() == true){
+				RobotContainer.intake.setSpeed(Constants.Intake.IntakeRoller.IntakeRunSpeed);
+			}
+
+			else {
+        		RobotContainer.intake.setSpeed(0.4);
+			}
 		}
+
 		else {
 			RobotContainer.intake.setSpeed(Constants.Intake.IntakeRoller.IntakeStopSpeed);
 		}
