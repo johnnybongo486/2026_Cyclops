@@ -144,8 +144,8 @@ public class AimToShootPoseOnly extends Command {
             double thetaPassRad = Math.toRadians(newThetaPass);
             double tof = newDistance / Constants.Shooter.ProjectileSpeed.metersPerSecond;
             double lateralSpeed = -vx * Math.sin(thetaPassRad) + vy * Math.cos(thetaPassRad);
-            double angularRate = lateralSpeed / Math.max(newDistance, 0.01) * (180.0 / Math.PI);
-            double radialSpeed = -(vx * Math.cos(thetaPassRad) + vy * Math.sin(thetaPassRad));
+            double angularRate = -lateralSpeed / Math.max(newDistance, 0.01) * (180.0 / Math.PI);
+            double radialSpeed = (vx * Math.cos(thetaPassRad) + vy * Math.sin(thetaPassRad));
 
             pointAngle -= angularRate * tof;
             tDistance = Math.max(newDistance - radialSpeed * tof, 0.5);

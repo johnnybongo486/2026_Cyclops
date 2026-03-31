@@ -21,9 +21,9 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 	private boolean isHoldingVelocity = false;
 
 	// Set Different Speeds
-	private double conversionFactor = 4096 / 600;
-	private double zeroVelocity = 0*conversionFactor;
-	private double maxVelocity = 5000*conversionFactor;
+	//private double conversionFactor = 4096 / 600;
+	private double zeroVelocity = 0;
+	private double maxVelocity = 55;
 
 	public final static int Shooter_PIDX = 0;
 
@@ -66,7 +66,7 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
         shooterFXConfig.CurrentLimits.StatorCurrentLimit = 40;
 
         /* PID Config */
-        shooterFXConfig.Slot0.kP = 0.75; // 0.7
+        shooterFXConfig.Slot0.kP = 0.8; // 0.7
         shooterFXConfig.Slot0.kI = 0.0; // 0.0
         shooterFXConfig.Slot0.kD = 0.0; // 0.5
 
