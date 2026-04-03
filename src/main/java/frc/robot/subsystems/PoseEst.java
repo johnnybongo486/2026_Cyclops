@@ -123,15 +123,15 @@ public class PoseEst extends SubsystemBase{
                 }
 
                 if(!doRejectUpdateLeft) {
-                    RobotContainer.drivetrain.addVisionMeasurement(mt2LeftBlue.pose, mt2LeftBlue.timestampSeconds, VecBuilder.fill(0.7,0.7,99999)); // n1: 0.7
+                    RobotContainer.drivetrain.addVisionMeasurement(mt2LeftBlue.pose, mt2LeftBlue.timestampSeconds, VecBuilder.fill(0.1,0.1,99999)); // n1: 0.7
                 }
 
                 if(!doRejectUpdateRight) {
-                    RobotContainer.drivetrain.addVisionMeasurement(mt2RightBlue.pose, mt2RightBlue.timestampSeconds, VecBuilder.fill(0.7,0.7,99999)); // n1: 0.7
+                    RobotContainer.drivetrain.addVisionMeasurement(mt2RightBlue.pose, mt2RightBlue.timestampSeconds, VecBuilder.fill(0.1,0.1,99999)); // n1: 0.7
                 }
 
                 if(!doRejectUpdateShooter) {
-                    RobotContainer.drivetrain.addVisionMeasurement(mt2ShooterBlue.pose, mt2ShooterBlue.timestampSeconds, VecBuilder.fill(0.7,0.7,99999)); // n1: 0.7
+                    RobotContainer.drivetrain.addVisionMeasurement(mt2ShooterBlue.pose, mt2ShooterBlue.timestampSeconds, VecBuilder.fill(0.1,0.1,99999)); // n1: 0.7
                 }
             } 
             

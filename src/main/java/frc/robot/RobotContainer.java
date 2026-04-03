@@ -147,8 +147,8 @@ public class RobotContainer {
     intake.setDefaultCommand(new RunIntakeAuto());
 
     // for pit testing, comment out the hood command below and uncomment the intake command below
-    // hood.setDefaultCommand(new ContinuousSetShooterAndHood());
-    intake.setDefaultCommand(new StopIntake());
+    hood.setDefaultCommand(new ContinuousSetShooterAndHood());
+    // intake.setDefaultCommand(new StopIntake());
 
     
     drivetrain.setDefaultCommand(
