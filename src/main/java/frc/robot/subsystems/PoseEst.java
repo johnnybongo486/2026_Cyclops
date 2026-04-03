@@ -95,8 +95,8 @@ public class PoseEst extends SubsystemBase{
         LimelightHelpers.PoseEstimate mt2ShooterBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shooter");
 
         //init rejects
-        doRejectUpdateLeft = true; // falses
-        doRejectUpdateRight = true; 
+        doRejectUpdateLeft = false; // falses
+        doRejectUpdateRight = false; 
         doRejectUpdateShooter = false;
 
         if (alliance.isPresent()) {
@@ -112,18 +112,15 @@ public class PoseEst extends SubsystemBase{
                     doRejectUpdateLeft = true;
                 }
 
-                else{}
 
                 if(mt2RightBlue.tagCount == 0) {
                     doRejectUpdateRight = true;
                 }
 
-                else{}
 
                 if(mt2ShooterBlue.tagCount == 0) {
                     doRejectUpdateShooter = true;
                 }
-                else{}
 
                 if(!doRejectUpdateLeft) {
                     RobotContainer.drivetrain.addVisionMeasurement(mt2LeftBlue.pose, mt2LeftBlue.timestampSeconds, VecBuilder.fill(0.7,0.7,99999)); // n1: 0.7
