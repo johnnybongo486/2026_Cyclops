@@ -132,12 +132,21 @@ public class RobotContainer {
     autoChooser.addOption("DoubleShotLeftSafe", new PathPlannerAuto("DoubleShotLeftSafe"));
     autoChooser.addOption("DoubleShotLeftLose", new PathPlannerAuto("DoubleShotLeftLose"));
 
+    autoChooser.addOption("ShortDoubleShotRightSteal", new PathPlannerAuto("ShortDoubleShotRightSteal"));
+    autoChooser.addOption("ShortDoubleShotRightLose", new PathPlannerAuto("ShortDoubleShotRightLose"));
+    autoChooser.addOption("ShortDoubleShotRightSafe", new PathPlannerAuto("ShortDoubleShotRightSafe"));
+    autoChooser.addOption("ShortDoubleShotLeftSteal", new PathPlannerAuto("ShortDoubleShotLeftSteal"));
+    autoChooser.addOption("ShortDoubleShotLeftSafe", new PathPlannerAuto("ShortDoubleShotLeftSafe"));
+    autoChooser.addOption("ShortDoubleShotLeftLose", new PathPlannerAuto("ShortDoubleShotLeftLose"));
+
     autoTab.add("Mode", autoChooser);
     
     // Set Default Commands
     uptake.setDefaultCommand(new StopUptake());
     agitator.setDefaultCommand(new StopAgitator());
     intake.setDefaultCommand(new RunIntakeAuto());
+
+    // for pit testing, comment out the hood command below and uncomment the intake command below
     hood.setDefaultCommand(new ContinuousSetShooterAndHood());
     //intake.setDefaultCommand(new StopIntake());
 
