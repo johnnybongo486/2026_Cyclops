@@ -148,15 +148,21 @@
           "data": {
             "commands": [
               {
-                "type": "named",
+                "type": "path",
                 "data": {
-                  "name": "StopShoot"
+                  "pathName": "LeftTrenchExit"
                 }
               },
               {
                 "type": "named",
                 "data": {
                   "name": "AutoSetShooterAndHood"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "StopShoot"
                 }
               }
             ]
