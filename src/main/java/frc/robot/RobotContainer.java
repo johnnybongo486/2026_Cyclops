@@ -95,6 +95,8 @@ public class RobotContainer {
 
   public static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+  public static double standardDeviation = 0.7;
+
   // The robot's subsystems and commands are defined here...
   public static Shooter shooter = new Shooter(); 
   public static Hood hood = new Hood();
@@ -207,7 +209,7 @@ public class RobotContainer {
     operatorController.x().whileTrue(new ReverseIntake());
     operatorController.x().onFalse(new RunIntakeAuto());
 
-    operatorController.y().whileTrue(new RunIntake());
+    operatorController.y().whileTrue(new StopIntake());
     operatorController.y().onFalse(new RunIntakeAuto());
 
     // for testing
