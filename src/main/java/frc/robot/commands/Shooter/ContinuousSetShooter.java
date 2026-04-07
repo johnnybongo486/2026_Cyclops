@@ -5,7 +5,7 @@ import frc.robot.RobotContainer;
 import edu.wpi.first.wpilibj2.command.Command;
 
 
-public class ContinuousSetShooterAndHood extends Command {
+public class ContinuousSetShooter extends Command {
     private double shooterSpeed = 0;
 
     private double tDistance;
@@ -15,7 +15,7 @@ public class ContinuousSetShooterAndHood extends Command {
 	private boolean isPassingMode = false;
 
 
-	public ContinuousSetShooterAndHood() {
+	public ContinuousSetShooter() {
 		addRequirements(RobotContainer.shooter);
 		addRequirements(RobotContainer.hood);
 	}
