@@ -113,11 +113,9 @@ public class AimToShootPoseOnly extends Command {
                             .withTargetDirection(Rotation2d.fromDegrees(targetHeadingDeg))
                             .withVelocityX(driverVx)
                             .withVelocityY(driverVy));
-
-            if (RobotContainer.poseEst.getIsSafe()) {
-                RobotContainer.hood.setTargetPosition(hoodPosition);
-                RobotContainer.hood.positionControl();
-            }
+            
+            RobotContainer.hood.setTargetPosition(hoodPosition);
+            RobotContainer.hood.positionControl();        
 
             SmartDashboard.putNumber("SOTM_TOF", tof);
             SmartDashboard.putNumber("SOTM_AngularRate", angularRate);
@@ -125,7 +123,6 @@ public class AimToShootPoseOnly extends Command {
             SmartDashboard.putNumber("SOTM_tDistance", tDistance);
             SmartDashboard.putNumber("ShooterTargetSOTM", shooterSpeed);
             SmartDashboard.putNumber("ShooterAdderSOTM", shooterAdder);
-
 
         } else {
             // --- PASSING MODE ---

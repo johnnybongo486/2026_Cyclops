@@ -51,15 +51,8 @@ public class ContinuousSetShooterAndHood extends Command {
 
 		//Move Subsystems
 		RobotContainer.shooter.velocityControl();
-		
-		
-		// check if the hood is in a safe place before moving it
-		if(RobotContainer.poseEst.getIsSafe() == true) {
-			RobotContainer.hood.positionControl();
-		} else {
-			RobotContainer.hood.setTargetPosition(Constants.Shooter.Hood.StoreHoodPosition);
-			RobotContainer.hood.positionControl();
-		}
+		RobotContainer.hood.setTargetPosition(Constants.Shooter.Hood.StoreHoodPosition);
+		RobotContainer.hood.positionControl();
 
 	}
 
