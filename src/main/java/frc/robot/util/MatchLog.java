@@ -3,23 +3,29 @@ package frc.robot.util;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.DriverStation;
 
-/** Thin wrapper around SignalLogger for match events + scoring markers. */
 public final class MatchLog {
-  private MatchLog() {}
+    private MatchLog() {}
 
-  /** Log a discrete event (auto start, scoring, intake pickup, etc.). */
-  public static void event(String name) {
-    SignalLogger.writeString("events/" + name, matchContext());
-  }
+    /** Writes a lifecycle event marker to the active hoot log. */
+    public static void event(String name) {
+        SignalLogger.writeString("events/" + name, matchContext());
+    }
 
-  /** Log an event with extra context (e.g. "scored/L4", "amp"). */
-  public static void event(String category, String detail) {
-    SignalLogger.writeString("events/" + category, detail + " @ " + matchContext());
-  }
+    /** Writes a lifecycle event marker with an extra detail string. */
+    public static void event(String category, String detail) {
+        SignalLogger.writeString("events/" + category, detail + " | " + matchContext());
+    }
 
-  private static String matchContext() {
-    return String.format("match=%.1fs mode=%s",
-        DriverStation.getMatchTime(),
-        DriverStation.isAutonomous() ? "auto" : DriverStation.isTeleop() ? "tele" : "disabled");
-  }
+    private static String matchContext() {
+        double matchTime = DriverStation.getMatchTime();
+        String mode;
+        if (DriverStation.isAutonomous()) {
+            mode = "auto";
+        } else if (DriverStation.isTeleop()) {
+            mode = "tele";
+        } else {
+            mode = "disabled";
+        }
+        return String.format("t=%.2f mode=%s", matchTime, mode);
+    }
 }
