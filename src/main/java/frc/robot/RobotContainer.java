@@ -32,6 +32,8 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeWrist;
 import frc.robot.subsystems.PoseEst;
 import frc.robot.subsystems.PoseLimelight;
+import java.util.HashMap;
+import java.util.Map;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -109,6 +111,7 @@ public class RobotContainer {
 
   /* Path follower */
   private SendableChooser<Command> autoChooser = new SendableChooser<>();
+  private final Map<Command, String> autoNames = new HashMap<>();
 
   // Establish Controllers
   public final CommandXboxController driverController =
@@ -127,19 +130,19 @@ public class RobotContainer {
     registerNamedCommands();
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto settings");
-    autoChooser.addOption("DoubleShotRightSteal", new PathPlannerAuto("DoubleShotRightSteal"));
-    autoChooser.addOption("DoubleShotRightLose", new PathPlannerAuto("DoubleShotRightLose"));
-    autoChooser.addOption("DoubleShotRightSafe", new PathPlannerAuto("DoubleShotRightSafe"));
-    autoChooser.addOption("DoubleShotLeftSteal", new PathPlannerAuto("DoubleShotLeftSteal"));
-    autoChooser.addOption("DoubleShotLeftSafe", new PathPlannerAuto("DoubleShotLeftSafe"));
-    autoChooser.addOption("DoubleShotLeftLose", new PathPlannerAuto("DoubleShotLeftLose"));
+    addAuto("DoubleShotRightSteal");
+    addAuto("DoubleShotRightLose");
+    addAuto("DoubleShotRightSafe");
+    addAuto("DoubleShotLeftSteal");
+    addAuto("DoubleShotLeftSafe");
+    addAuto("DoubleShotLeftLose");
 
-    autoChooser.addOption("ShortDoubleShotRightSteal", new PathPlannerAuto("ShortDoubleShotRightSteal"));
-    autoChooser.addOption("ShortDoubleShotRightLose", new PathPlannerAuto("ShortDoubleShotRightLose"));
-    autoChooser.addOption("ShortDoubleShotRightSafe", new PathPlannerAuto("ShortDoubleShotRightSafe"));
-    autoChooser.addOption("ShortDoubleShotLeftSteal", new PathPlannerAuto("ShortDoubleShotLeftSteal"));
-    autoChooser.addOption("ShortDoubleShotLeftSafe", new PathPlannerAuto("ShortDoubleShotLeftSafe"));
-    autoChooser.addOption("ShortDoubleShotLeftLose", new PathPlannerAuto("ShortDoubleShotLeftLose"));
+    addAuto("ShortDoubleShotRightSteal");
+    addAuto("ShortDoubleShotRightLose");
+    addAuto("ShortDoubleShotRightSafe");
+    addAuto("ShortDoubleShotLeftSteal");
+    addAuto("ShortDoubleShotLeftSafe");
+    addAuto("ShortDoubleShotLeftLose");
 
     autoTab.add("Mode", autoChooser);
     
@@ -272,6 +275,36 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
     }
+
+  /** Registers a PathPlannerAuto with both the chooser and the name-lookup map. */
+  private void addAuto(String name) {
+    Command cmd = new PathPlannerAuto(name);
+    autoChooser.addOption(name, cmd);
+    autoNames.put(cmd, name);
+  }
+
+  /**
+   * Returns a filesystem-safe identifier for the currently selected auto routine,
+   * suitable for use in log event markers.
+   *
+   * @return the auto name, or "none" if nothing is selected
+   */
+  public String getSelectedAutoName() {
+    Command selected = autoChooser.getSelected();
+    if (selected == null) {
+      return "none";
+    }
+    String name = selected.getName();
+    // getName() is meaningful when PathPlannerAuto has set it (not a raw class name).
+    if (name != null && !name.isEmpty()
+        && !name.equals("PathPlannerAuto")
+        && !name.equals("SequentialCommandGroup")) {
+      return name.replaceAll("[ /\\\\]", "_");
+    }
+    // Fall back to the key string stored at registration time.
+    String key = autoNames.get(selected);
+    return (key != null && !key.isEmpty()) ? key.replaceAll("[ /\\\\]", "_") : "none";
+  }
 
     public void registerNamedCommands() {
         /* Command registration for PathPlanner */     

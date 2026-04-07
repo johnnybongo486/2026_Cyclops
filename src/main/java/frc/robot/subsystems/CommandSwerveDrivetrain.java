@@ -122,7 +122,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         )
     );
 
-    /* The SysId routine to test */
+    /** The SysId routine to test — select via {@link #setSysIdRoutine}. */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
 
     /**
@@ -231,9 +231,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 ),
                 new PPHolonomicDriveController(
                     // PID constants for translation
-                    new PIDConstants(10, 0, 0),
+                    new PIDConstants(10, 0, 0.2),
                     // PID constants for rotation
-                    new PIDConstants(7, 0, 0)
+                    new PIDConstants(7, 0, 0.1)
                 ),
                 config,
                 // Assume the path needs to be flipped for Red vs Blue, this is normally the case
@@ -253,6 +253,23 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      */
     public Command applyRequest(Supplier<SwerveRequest> request) {
         return run(() -> this.setControl(request.get()));
+    }
+
+    public enum SysIdRoutineType { TRANSLATION, STEER, ROTATION }
+
+    /**
+     * Selects which mechanism to characterize for the next SysId run.
+     * Call this from RobotContainer (e.g. bound to a Shuffleboard chooser or button combo)
+     * before running {@link #sysIdQuasistatic} / {@link #sysIdDynamic}.
+     *
+     * @param type TRANSLATION for drive kV/kS, STEER for azimuth gains, ROTATION for heading controller
+     */
+    public void setSysIdRoutine(SysIdRoutineType type) {
+        switch (type) {
+            case TRANSLATION -> m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
+            case STEER       -> m_sysIdRoutineToApply = m_sysIdRoutineSteer;
+            case ROTATION    -> m_sysIdRoutineToApply = m_sysIdRoutineRotation;
+        }
     }
 
     /**
