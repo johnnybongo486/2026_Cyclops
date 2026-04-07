@@ -26,8 +26,6 @@ public class Robot extends TimedRobot {
   public Robot() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    robotContainer = new RobotContainer();
-
     String eventName = DriverStation.getEventName();
     if (eventName == null || eventName.isEmpty()) {
       eventName = "practice";
@@ -37,6 +35,8 @@ public class Robot extends TimedRobot {
     SignalLogger.writeString("meta/buildDate", BuildConstants.BUILD_DATE);
     SignalLogger.writeString("meta/eventName", eventName);
     SignalLogger.start();
+
+    robotContainer = new RobotContainer();
     MatchLog.event("robotInit");
   }
 
