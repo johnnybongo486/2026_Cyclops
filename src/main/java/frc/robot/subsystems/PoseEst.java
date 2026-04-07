@@ -40,10 +40,7 @@ public class PoseEst extends SubsystemBase{
     private double tY = 0;
     private double xH = 0;
     private double yH = 0;
-    private double prevHoodPos = 0;
-
     private boolean passingMode = true;
-    private boolean isSafe = true;
     private boolean isSafeIntake = true;
     private GenericEntry startingPose;
     private boolean isShooting = false;
@@ -58,10 +55,6 @@ public class PoseEst extends SubsystemBase{
     private double time;
     private double timeLeft;
     private boolean rejectLL;
-    private double safeMinR;
-    private double safeMaxR;
-    private double safeMinB;
-    private double safeMaxB;
     private double safeMinIntakeR;
     private double safeMaxIntakeR;
     private double safeMinIntakeB;
