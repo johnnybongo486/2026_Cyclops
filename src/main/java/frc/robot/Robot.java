@@ -101,6 +101,11 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
+  public void autonomousExit() {
+    MatchLog.event("autoEnd");
+  }
+
+  @Override
   public void teleopInit() {
     MatchLog.event("teleopStart");
     // This makes sure that the autonomous stops running when

@@ -142,3 +142,22 @@ wpi.java.configureTestTasks(test)
 tasks.withType(JavaCompile) {
     options.compilerArgs.add '-XDstringConcat=inline'
 }
+
+// build.gradle
+task generateBuildConstants {
+    doLast {
+        def gitSha = 'git rev-parse --short HEAD'.execute().text.trim()
+        def buildDate = new Date().format("yyyy-MM-dd HH:mm:ss")
+        def file = file("src/main/java/frc/robot/BuildConstants.java")
+        file.parentFile.mkdirs()
+        file.text = """\
+package frc.robot;
+public final class BuildConstants {
+  public static final String GIT_SHA = "${gitSha}";
+  public static final String BUILD_DATE = "${buildDate}";
+  private BuildConstants() {}
+}
+"""
+    }
+}
+compileJava.dependsOn generateBuildConstants
