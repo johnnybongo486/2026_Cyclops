@@ -91,11 +91,6 @@ public class Robot extends TimedRobot {
 
   }
 
-  @Override
-  public void autonomousExit() {
-    MatchLog.event("autoEnd");
-  }
-
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {}
