@@ -17,7 +17,7 @@ public class RunIntakeSlow extends Command {
 
 	// Called repeatedly when this Command is scheduled to run
 	public void execute() {
-        RobotContainer.intake.setSpeed(Constants.Intake.IntakeRoller.IntakeRunSpeed/2);
+        RobotContainer.intake.setSpeed(Constants.Intake.IntakeRoller.IntakeRunSpeed/4);
 	}
 
 	// Make this return true when this Command no longer needs to run execute()

@@ -133,6 +133,10 @@ public class RobotContainer {
     autoChooser.addOption("DoubleShotLeftSteal", new PathPlannerAuto("DoubleShotLeftSteal"));
     autoChooser.addOption("DoubleShotLeftSafe", new PathPlannerAuto("DoubleShotLeftSafe"));
     autoChooser.addOption("DoubleShotLeftLose", new PathPlannerAuto("DoubleShotLeftLose"));
+    autoChooser.addOption("PostUVMShortDoubleShotRightSafe", new PathPlannerAuto("PostUVMShortDoubleShotRightSafe"));
+    autoChooser.addOption("PostUVMDoubleShotRightSafe", new PathPlannerAuto("PostUVMDoubleShotRightSafe"));
+    autoChooser.addOption("PostUVMShortDoubleShotRightSteal", new PathPlannerAuto("PostUVMShortDoubleShotRightSteal"));
+
 
     autoChooser.addOption("ShortDoubleShotRightSteal", new PathPlannerAuto("ShortDoubleShotRightSteal"));
     autoChooser.addOption("ShortDoubleShotRightLose", new PathPlannerAuto("ShortDoubleShotRightLose"));
@@ -213,8 +217,8 @@ public class RobotContainer {
     operatorController.y().onFalse(new RunIntakeAuto());
 
     // for testing
-    // operatorController.a().onTrue(new SetShooterVelocity(20));
-    // operatorController.b().onTrue(new SetShooterVelocity(41));
+    // operatorController.a().onTrue(new SetHoodPosition(2));
+    // operatorController.b().onTrue(new SetHoodPosition(8));
 
     // Operator Fixed Position Shooting
     // bumpers on Hub, intake against ladders, side shoot from trenches
