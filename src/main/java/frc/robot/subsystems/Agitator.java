@@ -10,12 +10,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.DeviceIds;
+import frc.robot.util.MatchLog;
 
 public class Agitator extends SubsystemBase {
 
 	private TalonFX agitatorKraken = new TalonFX(DeviceIds.Serializer.AgitatorMotorId, "canivore");
     private TalonFXConfiguration agitatorFXConfig = new TalonFXConfiguration();
     private TorqueCurrentFOC torqueDutyCycle = new TorqueCurrentFOC(0);
+    private double prevSpeed = 0;
 
 	public Agitator() {
         /** Shooter Motor Configuration */
@@ -46,7 +48,12 @@ public class Agitator extends SubsystemBase {
 	}
 
 	public void setSpeed(double speed) {
-        //this.agitatorKraken.set(speed);
+        if (prevSpeed == 0 && speed != 0) {
+            MatchLog.event("agitator/speed", String.format("start speed=%.2f", speed));
+        } else if (prevSpeed != 0 && speed == 0) {
+            MatchLog.event("agitator/speed", "stop");
+        }
+        prevSpeed = speed;
         torqueDutyCycle.withOutput(30).withDeadband(1).withMaxAbsDutyCycle(speed);
         this.agitatorKraken.setControl(torqueDutyCycle);
 	}

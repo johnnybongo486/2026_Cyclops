@@ -2,6 +2,7 @@ package frc.robot.commands.Shooter;
 
 import frc.robot.RobotContainer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.util.MatchLog;
 
 public class SetShooterVelocity extends Command {
 	private double shooterVelocity = 0;
@@ -29,12 +30,16 @@ public class SetShooterVelocity extends Command {
 
 	// Called once after isFinished returns true
 	protected void end() {
-
+		MatchLog.event("cmd/shooter/atVelocity",
+			String.format("target=%.2f actual=%.2f rot/s",
+				shooterVelocity, RobotContainer.shooter.getCurrentVelocity()));
 	}
 
 	// Called when another command which requires one or more of the same
 	// subsystems is scheduled to run
 	protected void interrupted() {
-
+		MatchLog.event("cmd/shooter/velocityInterrupted",
+			String.format("target=%.2f actual=%.2f rot/s",
+				shooterVelocity, RobotContainer.shooter.getCurrentVelocity()));
 	}
 }
