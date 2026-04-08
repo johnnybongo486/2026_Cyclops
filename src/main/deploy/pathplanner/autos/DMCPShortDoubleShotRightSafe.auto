@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "PostUVMDoubleShotRightSafe1"
+                  "pathName": "DCMPDoubleShotRightSafe1"
                 }
               },
               {
@@ -106,7 +106,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "PostUVMShortDoubleShotRightSteal2"
+                  "pathName": "DCMPShortDoubleShotRightSteal2"
                 }
               },
               {
@@ -169,7 +169,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "PostUVMRightTrenchExit"
+                  "pathName": "DCMPRightTrenchExit"
                 }
               },
               {

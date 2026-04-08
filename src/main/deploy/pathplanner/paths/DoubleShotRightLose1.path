@@ -206,7 +206,7 @@
     "rotation": 40.0
   },
   "reversed": false,
-  "folder": "DoubleShotRightLose",
+  "folder": "Archive",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
