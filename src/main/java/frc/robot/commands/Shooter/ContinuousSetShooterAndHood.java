@@ -47,7 +47,7 @@ public class ContinuousSetShooterAndHood extends Command {
 
 		//Send Values
 		RobotContainer.shooter.setTargetVelocity(shooterSpeed);
-		RobotContainer.hood.setTargetPosition(hoodPosition);
+		RobotContainer.hood.setTargetPosition(Constants.Shooter.Hood.StoreHoodPosition);  // hoodPosition
 
 		//Move Subsystems
 		RobotContainer.shooter.velocityControl();

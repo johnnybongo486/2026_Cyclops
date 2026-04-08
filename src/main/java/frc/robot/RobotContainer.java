@@ -95,6 +95,8 @@ public class RobotContainer {
 
   public static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+  public static double standardDeviation = 0.7;
+
   // The robot's subsystems and commands are defined here...
   public static Shooter shooter = new Shooter(); 
   public static Hood hood = new Hood();
@@ -131,6 +133,17 @@ public class RobotContainer {
     autoChooser.addOption("DoubleShotLeftSteal", new PathPlannerAuto("DoubleShotLeftSteal"));
     autoChooser.addOption("DoubleShotLeftSafe", new PathPlannerAuto("DoubleShotLeftSafe"));
     autoChooser.addOption("DoubleShotLeftLose", new PathPlannerAuto("DoubleShotLeftLose"));
+    autoChooser.addOption("PostUVMShortDoubleShotRightSafe", new PathPlannerAuto("PostUVMShortDoubleShotRightSafe"));
+    autoChooser.addOption("PostUVMDoubleShotRightSafe", new PathPlannerAuto("PostUVMDoubleShotRightSafe"));
+    autoChooser.addOption("PostUVMShortDoubleShotRightSteal", new PathPlannerAuto("PostUVMShortDoubleShotRightSteal"));
+
+
+    autoChooser.addOption("ShortDoubleShotRightSteal", new PathPlannerAuto("ShortDoubleShotRightSteal"));
+    autoChooser.addOption("ShortDoubleShotRightLose", new PathPlannerAuto("ShortDoubleShotRightLose"));
+    autoChooser.addOption("ShortDoubleShotRightSafe", new PathPlannerAuto("ShortDoubleShotRightSafe"));
+    autoChooser.addOption("ShortDoubleShotLeftSteal", new PathPlannerAuto("ShortDoubleShotLeftSteal"));
+    autoChooser.addOption("ShortDoubleShotLeftSafe", new PathPlannerAuto("ShortDoubleShotLeftSafe"));
+    autoChooser.addOption("ShortDoubleShotLeftLose", new PathPlannerAuto("ShortDoubleShotLeftLose"));
 
     autoTab.add("Mode", autoChooser);
     
@@ -138,8 +151,10 @@ public class RobotContainer {
     uptake.setDefaultCommand(new StopUptake());
     agitator.setDefaultCommand(new StopAgitator());
     intake.setDefaultCommand(new RunIntakeAuto());
+
+    // for pit testing, comment out the hood command below and uncomment the intake command below
     hood.setDefaultCommand(new ContinuousSetShooterAndHood());
-    //intake.setDefaultCommand(new StopIntake());
+    // intake.setDefaultCommand(new StopIntake());
 
     
     drivetrain.setDefaultCommand(
@@ -198,12 +213,12 @@ public class RobotContainer {
     operatorController.x().whileTrue(new ReverseIntake());
     operatorController.x().onFalse(new RunIntakeAuto());
 
-    operatorController.y().whileTrue(new RunIntake());
+    operatorController.y().whileTrue(new StopIntake());
     operatorController.y().onFalse(new RunIntakeAuto());
 
     // for testing
-    // operatorController.a().onTrue(new SetShooterVelocity(20));
-    // operatorController.b().onTrue(new SetShooterVelocity(41));
+    // operatorController.a().onTrue(new SetHoodPosition(2));
+    // operatorController.b().onTrue(new SetHoodPosition(8));
 
     // Operator Fixed Position Shooting
     // bumpers on Hub, intake against ladders, side shoot from trenches

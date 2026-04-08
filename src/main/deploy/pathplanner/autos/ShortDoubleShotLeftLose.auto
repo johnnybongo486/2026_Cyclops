@@ -36,7 +36,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DoubleShotLeftSteal1"
+                  "pathName": "DoubleShotLeftLose"
                 }
               }
             ]
@@ -87,7 +87,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DoubleShotLeftSteal2"
+                  "pathName": "ShortDoubleShotLeftSteal2"
                 }
               },
               {

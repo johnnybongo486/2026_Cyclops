@@ -95,8 +95,8 @@ public class PoseEst extends SubsystemBase{
         LimelightHelpers.PoseEstimate mt2ShooterBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shooter");
 
         //init rejects
-        doRejectUpdateLeft = true; // falses
-        doRejectUpdateRight = true; 
+        doRejectUpdateLeft = false; // falses
+        doRejectUpdateRight = false; 
         doRejectUpdateShooter = false;
 
         if (alliance.isPresent()) {
@@ -112,29 +112,26 @@ public class PoseEst extends SubsystemBase{
                     doRejectUpdateLeft = true;
                 }
 
-                else{}
 
                 if(mt2RightBlue.tagCount == 0) {
                     doRejectUpdateRight = true;
                 }
 
-                else{}
 
                 if(mt2ShooterBlue.tagCount == 0) {
                     doRejectUpdateShooter = true;
                 }
-                else{}
 
                 if(!doRejectUpdateLeft) {
-                    RobotContainer.drivetrain.addVisionMeasurement(mt2LeftBlue.pose, mt2LeftBlue.timestampSeconds, VecBuilder.fill(0.7,0.7,99999)); // n1: 0.7
+                    RobotContainer.drivetrain.addVisionMeasurement(mt2LeftBlue.pose, mt2LeftBlue.timestampSeconds, VecBuilder.fill(RobotContainer.standardDeviation,RobotContainer.standardDeviation,99999)); // n1: 0.7
                 }
 
                 if(!doRejectUpdateRight) {
-                    RobotContainer.drivetrain.addVisionMeasurement(mt2RightBlue.pose, mt2RightBlue.timestampSeconds, VecBuilder.fill(0.7,0.7,99999)); // n1: 0.7
+                    RobotContainer.drivetrain.addVisionMeasurement(mt2RightBlue.pose, mt2RightBlue.timestampSeconds, VecBuilder.fill(RobotContainer.standardDeviation,RobotContainer.standardDeviation,99999)); // n1: 0.7
                 }
 
                 if(!doRejectUpdateShooter) {
-                    RobotContainer.drivetrain.addVisionMeasurement(mt2ShooterBlue.pose, mt2ShooterBlue.timestampSeconds, VecBuilder.fill(0.7,0.7,99999)); // n1: 0.7
+                    RobotContainer.drivetrain.addVisionMeasurement(mt2ShooterBlue.pose, mt2ShooterBlue.timestampSeconds, VecBuilder.fill(RobotContainer.standardDeviation,RobotContainer.standardDeviation,99999)); // n1: 0.7
                 }
             } 
             
@@ -280,10 +277,10 @@ public class PoseEst extends SubsystemBase{
                 }
 
                 else if (Math.abs(currentVelocity) >= 0 && Math.abs(currentVelocity) <= 1 ) {
-                    safeMinR = 11.1;
-                    safeMaxR = 12.5;
-                    safeMinB = 4.0;
-                    safeMaxB = 5.3;
+                    safeMinR = 11.1;  // 11.1
+                    safeMaxR = 12.5;  // 12.5
+                    safeMinB = 4.0;     // 4.0
+                    safeMaxB = 5.3;     //5.3
                 }
 
                 else {
@@ -614,5 +611,6 @@ public class PoseEst extends SubsystemBase{
         SmartDashboard.putString("Match Timing", timing);
         SmartDashboard.putNumber("TimeLeft", countdown());
         SmartDashboard.putBoolean("REJECT LL", rejectLL);
+        SmartDashboard.putNumber("StandardDeviation", RobotContainer.standardDeviation);
     }
 }
