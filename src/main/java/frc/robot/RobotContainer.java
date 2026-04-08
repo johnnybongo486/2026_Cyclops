@@ -10,7 +10,7 @@ import frc.robot.commands.Serializer.RunUptake;
 import frc.robot.commands.Serializer.SlowAgitator;
 import frc.robot.commands.Serializer.StopAgitator;
 import frc.robot.commands.Shooter.AimToShootPoseOnly;
-import frc.robot.commands.Shooter.ContinuousSetShooter;
+import frc.robot.commands.Shooter.ContinuousSetShooterAndHood;
 import frc.robot.commands.Shooter.JoystickShooter;
 import frc.robot.commands.Shooter.SetShooterVelocity;
 import frc.robot.commands.Shooter.ShooterAdderCommand;
@@ -32,8 +32,6 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeWrist;
 import frc.robot.subsystems.PoseEst;
 import frc.robot.subsystems.PoseLimelight;
-import java.util.HashMap;
-import java.util.Map;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -111,7 +109,6 @@ public class RobotContainer {
 
   /* Path follower */
   private SendableChooser<Command> autoChooser = new SendableChooser<>();
-  private final Map<Command, String> autoNames = new HashMap<>();
 
   // Establish Controllers
   public final CommandXboxController driverController =
@@ -130,23 +127,23 @@ public class RobotContainer {
     registerNamedCommands();
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto settings");
-    
-    addAuto("DoubleShotRightSteal");
-    addAuto("DoubleShotRightLose");
-    addAuto("DoubleShotRightSafe");
-    addAuto("DoubleShotLeftSteal");
-    addAuto("DoubleShotLeftSafe");
-    addAuto("DoubleShotLeftLose");
-    addAuto("PostUVMShortDoubleShotRightSafe");
-    addAuto("PostUVMDoubleShotRightSafe");
-    addAuto("PostUVMShortDoubleShotRightSteal");
+    autoChooser.addOption("DoubleShotRightSteal", new PathPlannerAuto("DoubleShotRightSteal"));
+    autoChooser.addOption("DoubleShotRightLose", new PathPlannerAuto("DoubleShotRightLose"));
+    autoChooser.addOption("DoubleShotRightSafe", new PathPlannerAuto("DoubleShotRightSafe"));
+    autoChooser.addOption("DoubleShotLeftSteal", new PathPlannerAuto("DoubleShotLeftSteal"));
+    autoChooser.addOption("DoubleShotLeftSafe", new PathPlannerAuto("DoubleShotLeftSafe"));
+    autoChooser.addOption("DoubleShotLeftLose", new PathPlannerAuto("DoubleShotLeftLose"));
+    autoChooser.addOption("PostUVMShortDoubleShotRightSafe", new PathPlannerAuto("PostUVMShortDoubleShotRightSafe"));
+    autoChooser.addOption("PostUVMDoubleShotRightSafe", new PathPlannerAuto("PostUVMDoubleShotRightSafe"));
+    autoChooser.addOption("PostUVMShortDoubleShotRightSteal", new PathPlannerAuto("PostUVMShortDoubleShotRightSteal"));
 
-    addAuto("ShortDoubleShotRightSteal");
-    addAuto("ShortDoubleShotRightLose");
-    addAuto("ShortDoubleShotRightSafe");
-    addAuto("ShortDoubleShotLeftSteal");
-    addAuto("ShortDoubleShotLeftSafe");
-    addAuto("ShortDoubleShotLeftLose");
+
+    autoChooser.addOption("ShortDoubleShotRightSteal", new PathPlannerAuto("ShortDoubleShotRightSteal"));
+    autoChooser.addOption("ShortDoubleShotRightLose", new PathPlannerAuto("ShortDoubleShotRightLose"));
+    autoChooser.addOption("ShortDoubleShotRightSafe", new PathPlannerAuto("ShortDoubleShotRightSafe"));
+    autoChooser.addOption("ShortDoubleShotLeftSteal", new PathPlannerAuto("ShortDoubleShotLeftSteal"));
+    autoChooser.addOption("ShortDoubleShotLeftSafe", new PathPlannerAuto("ShortDoubleShotLeftSafe"));
+    autoChooser.addOption("ShortDoubleShotLeftLose", new PathPlannerAuto("ShortDoubleShotLeftLose"));
 
     autoTab.add("Mode", autoChooser);
     
@@ -156,7 +153,7 @@ public class RobotContainer {
     intake.setDefaultCommand(new RunIntakeAuto());
 
     // for pit testing, comment out the hood command below and uncomment the intake command below
-    hood.setDefaultCommand(new ContinuousSetShooter());
+    hood.setDefaultCommand(new ContinuousSetShooterAndHood());
     // intake.setDefaultCommand(new StopIntake());
 
     
@@ -203,7 +200,7 @@ public class RobotContainer {
 
     // aim using pose only
     driverController.leftTrigger().whileTrue(new AimToShootPoseOnly());
-    driverController.leftTrigger().onFalse(new ContinuousSetShooter());
+    driverController.leftTrigger().onFalse(new ContinuousSetShooterAndHood());
 
     //intake
     driverController.leftBumper().onTrue(new RunIntakeAuto().alongWith(new SlowAgitator()));
@@ -280,40 +277,10 @@ public class RobotContainer {
         return autoChooser.getSelected();
     }
 
-  /** Registers a PathPlannerAuto with both the chooser and the name-lookup map. */
-  private void addAuto(String name) {
-    Command cmd = new PathPlannerAuto(name);
-    autoChooser.addOption(name, cmd);
-    autoNames.put(cmd, name);
-  }
-
-  /**
-   * Returns a filesystem-safe identifier for the currently selected auto routine,
-   * suitable for use in log event markers.
-   *
-   * @return the auto name, or "none" if nothing is selected
-   */
-  public String getSelectedAutoName() {
-    Command selected = autoChooser.getSelected();
-    if (selected == null) {
-      return "none";
-    }
-    String name = selected.getName();
-    // getName() is meaningful when PathPlannerAuto has set it (not a raw class name).
-    if (name != null && !name.isEmpty()
-        && !name.equals("PathPlannerAuto")
-        && !name.equals("SequentialCommandGroup")) {
-      return name.replaceAll("[ /\\\\]", "_");
-    }
-    // Fall back to the key string stored at registration time.
-    String key = autoNames.get(selected);
-    return (key != null && !key.isEmpty()) ? key.replaceAll("[ /\\\\]", "_") : "none";
-  }
-
     public void registerNamedCommands() {
         /* Command registration for PathPlanner */     
         NamedCommands.registerCommand("LowerIntake", new AutoLowerIntake().withTimeout(0.01));
-        NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooter());
+        NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooterAndHood());
         NamedCommands.registerCommand("AimToShoot", new AimToShootPoseOnly());
         NamedCommands.registerCommand("ShootCommand", (new ShooterAdderCommand(Constants.Shooter.ShooterSpeed.ShooterAdder).withTimeout(0.25).andThen(new ShooterAdderCommand(0))).alongWith(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.squeeze)))));
         NamedCommands.registerCommand("RunIntake", new RunIntake());

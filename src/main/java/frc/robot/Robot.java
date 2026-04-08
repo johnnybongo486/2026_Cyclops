@@ -1,13 +1,10 @@
 package frc.robot;
 
-import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.BuildConstants;
-import frc.robot.util.MatchLog;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -26,18 +23,7 @@ public class Robot extends TimedRobot {
   public Robot() {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
-    String eventName = DriverStation.getEventName();
-    if (eventName == null || eventName.isEmpty()) {
-      eventName = "practice";
-    }
-    SignalLogger.setPath("/media/sda1/");
-    SignalLogger.writeString("meta/gitSha", BuildConstants.GIT_SHA);
-    SignalLogger.writeString("meta/buildDate", BuildConstants.BUILD_DATE);
-    SignalLogger.writeString("meta/eventName", eventName);
-    SignalLogger.start();
-
     robotContainer = new RobotContainer();
-    MatchLog.event("robotInit");
   }
 
   /**
@@ -68,7 +54,6 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-    MatchLog.event("disabled");
   }
 
   @Override
@@ -80,7 +65,6 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    MatchLog.event("autoStart/" + robotContainer.getSelectedAutoName());
     m_autonomousCommand = robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -96,13 +80,7 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {}
 
   @Override
-  public void autonomousExit() {
-    MatchLog.event("autoEnd");
-  }
-
-  @Override
   public void teleopInit() {
-    MatchLog.event("teleopStart");
     // This makes sure that the autonomous stops running when
     // teleop starts running. If you want the autonomous to
     // continue until interrupted by another command, remove
@@ -115,11 +93,6 @@ public class Robot extends TimedRobot {
     //RobotContainer.drivetrain.seedFieldCentric(Rotation2d.kZero);
 
     RobotContainer.standardDeviation = 0.3;
-  }
-
-  @Override
-  public void teleopExit() {
-    MatchLog.event("teleopEnd");
   }
 
   /** This function is called periodically during operator control. */
