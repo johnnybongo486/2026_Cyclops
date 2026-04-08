@@ -40,10 +40,7 @@ public class PoseEst extends SubsystemBase{
     private double tY = 0;
     private double xH = 0;
     private double yH = 0;
-    private double prevHoodPos = 0;
-
     private boolean passingMode = true;
-    private boolean isSafe = true;
     private boolean isSafeIntake = true;
     private GenericEntry startingPose;
     private boolean isShooting = false;
@@ -58,10 +55,6 @@ public class PoseEst extends SubsystemBase{
     private double time;
     private double timeLeft;
     private boolean rejectLL;
-    private double safeMinR;
-    private double safeMaxR;
-    private double safeMinB;
-    private double safeMaxB;
     private double safeMinIntakeR;
     private double safeMaxIntakeR;
     private double safeMinIntakeB;
@@ -245,117 +238,6 @@ public class PoseEst extends SubsystemBase{
                 } 
             }
             return passingMode;   
-        }
-
-        else {
-            return false;
-        }
-    }
-
-    public boolean getIsSafe(){
-
-        Pose2d currentPose = RobotContainer.drivetrain.getState().Pose;
-        double currentVelocity = RobotContainer.drivetrain.getXSpeed();
-
-        if (DriverStation.getAlliance().isPresent() == true) {
-
-            //if (alliance.get() == Alliance.Red) {
-                
-                // Check current velocity and set safe zone
-                if (Math.abs(currentVelocity) > 3) {
-                    safeMinR= 10.1;
-                    safeMaxR = 13.5;
-                    safeMinB = 2.8;
-                    safeMaxB = 6.8;
-                }
-
-                else if (Math.abs(currentVelocity) > 1 && Math.abs(currentVelocity) <= 3 ) {
-                    safeMinR = 10.6;
-                    safeMaxR = 13;
-                    safeMinB = 3.3;
-                    safeMaxB = 6.3;
-                }
-
-                else if (Math.abs(currentVelocity) >= 0 && Math.abs(currentVelocity) <= 1 ) {
-                    safeMinR = 11.1;  // 11.1
-                    safeMaxR = 12.5;  // 12.5
-                    safeMinB = 4.0;     // 4.0
-                    safeMaxB = 5.3;     //5.3
-                }
-
-                else {
-
-                }
-
-
-
-                // Set Min Max based on velocity
-                if (currentPose.getX() >= safeMinR && currentPose.getX() <= safeMaxR) {
-                    isSafe = false;
-
-                    // save where the hood was prior to entering the danger zone
-                    prevHoodPos = RobotContainer.hood.getCurrentPosition();
-                }
-
-                else if (currentPose.getX() >= safeMinB && currentPose.getX() <= safeMaxB) {
-                    isSafe = false;
-
-                    // save where the hood was prior to entering the danger zone
-                    prevHoodPos = RobotContainer.hood.getCurrentPosition();
-                }
-
-                else {
-                    if(isSafe == false) {
-                        // this is transition from unsafe to safe; reset the hood postion to how it was
-                        // prior to entering the danger zone
-                        RobotContainer.hood.setTargetPosition(prevHoodPos);
-			            RobotContainer.hood.positionControl();
-                    }
-
-                    isSafe = true;
-                }
-            //}
-
-            /*else {
-                // Check current velocity and set safe zone
-                if (Math.abs(currentVelocity) > 3) {
-                    safeMinB = 2.8;
-                    safeMaxB = 6.8;
-                }
-
-                else if (Math.abs(currentVelocity) > 1 && Math.abs(currentVelocity) <= 3 ) {
-                    safeMinB = 3.3;
-                    safeMaxB = 6.3;
-                }
-
-                else if (Math.abs(currentVelocity) >= 0 && Math.abs(currentVelocity) <= 1 ) {
-                    safeMinB = 4.0;
-                    safeMaxB = 5.3;
-                }
-
-                else{
-
-                }
-
-                // Set Min Max based on velocity
-                if (currentPose.getX() >= safeMinB && currentPose.getX() <= safeMaxB) { // 4.0, 5.3
-                    isSafe = false;
-
-                    // save where the hood was prior to entering the danger zone
-                    prevHoodPos = RobotContainer.hood.getCurrentPosition();
-                }
-                else {
-                    if(isSafe == false) {
-                        // this is transition from unsafe to safe; reset the hood postion to how it was
-                        // prior to entering the danger zone
-                        RobotContainer.hood.setTargetPosition(prevHoodPos);
-			            RobotContainer.hood.positionControl();
-                    }
-
-                    isSafe = true;
-                } */
-            //}
-            return isSafe;   
         }
 
         else {
@@ -601,7 +483,6 @@ public class PoseEst extends SubsystemBase{
         SmartDashboard.putNumber("THETA", theta);
         SmartDashboard.putNumber("ROBOTANGLE", robotAngle); 
         SmartDashboard.putBoolean("Passing Mode", getPassingMode());
-        SmartDashboard.putBoolean("Is Safe", getIsSafe());
         SmartDashboard.putBoolean("Is Safe to Intake", getIsSafeIntake());
         SmartDashboard.putNumber("Distance", distanceTarget());
         SmartDashboard.putBoolean("Robot Facing Blue Driver Station", getStartingPose());
