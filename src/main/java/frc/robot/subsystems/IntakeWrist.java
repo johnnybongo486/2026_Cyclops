@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.MatchLog;
 
 public class IntakeWrist extends SubsystemBase implements IPositionControlledSubsystem {
 
@@ -103,12 +104,20 @@ public class IntakeWrist extends SubsystemBase implements IPositionControlledSub
 		if (!isValidPosition(position)) {
 			return false;
 		} else {
+			if (position != this.targetPosition) {
+				MatchLog.event("intakeWrist/targetPosition",
+					String.format("%.3f -> %.3f rot", this.targetPosition, position));
+			}
 			this.targetPosition = position;
 			return true;
 		}
 	}
 
 	public void forceSetTargetPosition(double position) {
+		if (position != this.targetPosition) {
+			MatchLog.event("intakeWrist/targetPosition",
+				String.format("%.3f -> %.3f rot (forced)", this.targetPosition, position));
+		}
 		this.targetPosition = position;
 	}
 

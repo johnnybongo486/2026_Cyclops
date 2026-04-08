@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.LimelightHelpers;
 import frc.robot.DeviceIds;
 import frc.robot.RobotContainer;
+import frc.robot.util.MatchLog;
 
 public class PoseLimelight extends SubsystemBase {
 
@@ -16,6 +17,9 @@ public class PoseLimelight extends SubsystemBase {
    NetworkTable tableShooter;
 
    NetworkTableInstance Inst;
+
+   // Tracks the last applied camera config so we only log on changes
+   private String lastAppliedPoseConfig = "";
 
    //  Blue Side
    private double blueLLForwardLeft = -0.127;
@@ -104,6 +108,14 @@ public class PoseLimelight extends SubsystemBase {
                LimelightHelpers.setCameraPose_RobotSpace("limelight-right", blueLLForwardRight, blueLLRightRight, blueLLUpRight, blueLLRollRight, blueLLPitchRight, blueLLYawRight);
                LimelightHelpers.setCameraPose_RobotSpace("limelight-shooter", blueLLForwardShooter, blueLLRightShooter, blueLLUpShooter, blueLLRollShooter, blueLLPitchShooter, blueLLYawShooter);
             }
+         }
+
+         // Log when the applied config changes (catches wrong alliance/facing at match start)
+         String appliedConfig = String.format("alliance=%s facing=%s",
+               DriverStation.getAlliance().get(), isFacingBlue ? "blue" : "red");
+         if (!appliedConfig.equals(lastAppliedPoseConfig)) {
+            MatchLog.event("limelight/poseConfig", appliedConfig);
+            lastAppliedPoseConfig = appliedConfig;
          }
       }
 

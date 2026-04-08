@@ -15,6 +15,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.MatchLog;
 
 public class Shooter extends SubsystemBase implements IVelocityControlledSubsystem {
 
@@ -122,12 +123,20 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 		if (!isValidVelocity(Velocity)) {
 			return false;
 		} else {
+			if (Velocity != this.targetVelocity) {
+				MatchLog.event("shooter/targetVelocity",
+					String.format("%.2f -> %.2f rot/s", this.targetVelocity, Velocity));
+			}
 			this.targetVelocity = Velocity;
 			return true;
 		}
 	}
 
 	public void forceSetTargetVelocity(double Velocity) {
+		if (Velocity != this.targetVelocity) {
+			MatchLog.event("shooter/targetVelocity",
+				String.format("%.2f -> %.2f rot/s (forced)", this.targetVelocity, Velocity));
+		}
 		this.targetVelocity = Velocity;
 	}
 
