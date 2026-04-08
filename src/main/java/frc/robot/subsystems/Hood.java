@@ -50,9 +50,9 @@ public class Hood extends SubsystemBase implements IPositionControlledSubsystem 
         hoodFXConfig.CurrentLimits.StatorCurrentLimit = 20;
 
         /* PID Config */
-        hoodFXConfig.Slot0.kP = 0.2;
+        hoodFXConfig.Slot0.kP = 0.9;
         hoodFXConfig.Slot0.kI = 0;
-        hoodFXConfig.Slot0.kD = 0.01;
+        hoodFXConfig.Slot0.kD = 0.02;
 
         /* Open and Closed Loop Ramping */
         hoodFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.25;
@@ -62,8 +62,8 @@ public class Hood extends SubsystemBase implements IPositionControlledSubsystem 
         hoodFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0;
 
         //Config Acceleration and Velocity
-        hoodFXConfig.MotionMagic.withMotionMagicAcceleration(300);
-        hoodFXConfig.MotionMagic.withMotionMagicCruiseVelocity(300);
+        hoodFXConfig.MotionMagic.withMotionMagicAcceleration(900);
+        hoodFXConfig.MotionMagic.withMotionMagicCruiseVelocity(900);
 
         // Config Motor
         hoodKraken.getConfigurator().apply(hoodFXConfig);

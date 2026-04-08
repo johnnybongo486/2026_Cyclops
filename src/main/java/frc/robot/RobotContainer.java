@@ -130,12 +130,16 @@ public class RobotContainer {
     registerNamedCommands();
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto settings");
+    
     addAuto("DoubleShotRightSteal");
     addAuto("DoubleShotRightLose");
     addAuto("DoubleShotRightSafe");
     addAuto("DoubleShotLeftSteal");
     addAuto("DoubleShotLeftSafe");
     addAuto("DoubleShotLeftLose");
+    addAuto("PostUVMShortDoubleShotRightSafe");
+    addAuto("PostUVMDoubleShotRightSafe");
+    addAuto("PostUVMShortDoubleShotRightSteal");
 
     addAuto("ShortDoubleShotRightSteal");
     addAuto("ShortDoubleShotRightLose");
@@ -216,8 +220,8 @@ public class RobotContainer {
     operatorController.y().onFalse(new RunIntakeAuto());
 
     // for testing
-    // operatorController.a().onTrue(new SetShooterVelocity(20));
-    // operatorController.b().onTrue(new SetShooterVelocity(41));
+    // operatorController.a().onTrue(new SetHoodPosition(2));
+    // operatorController.b().onTrue(new SetHoodPosition(8));
 
     // Operator Fixed Position Shooting
     // bumpers on Hub, intake against ladders, side shoot from trenches
