@@ -10,7 +10,7 @@ import frc.robot.commands.Serializer.RunUptake;
 import frc.robot.commands.Serializer.SlowAgitator;
 import frc.robot.commands.Serializer.StopAgitator;
 import frc.robot.commands.Shooter.AimToShootPoseOnly;
-import frc.robot.commands.Shooter.ContinuousSetShooterAndHood;
+import frc.robot.commands.Shooter.ContinuousSetShooter;
 import frc.robot.commands.Shooter.JoystickShooter;
 import frc.robot.commands.Shooter.SetShooterVelocity;
 import frc.robot.commands.Shooter.ShooterAdderCommand;
@@ -160,7 +160,7 @@ public class RobotContainer {
     intake.setDefaultCommand(new RunIntakeAuto());
 
     // for pit testing, comment out the hood command below and uncomment the intake command below
-    hood.setDefaultCommand(new ContinuousSetShooterAndHood());
+    hood.setDefaultCommand(new ContinuousSetShooter());
     // intake.setDefaultCommand(new StopIntake());
 
     
@@ -207,7 +207,7 @@ public class RobotContainer {
 
     // aim using pose only
     driverController.leftTrigger().whileTrue(new AimToShootPoseOnly());
-    driverController.leftTrigger().onFalse(new ContinuousSetShooterAndHood());
+    driverController.leftTrigger().onFalse(new ContinuousSetShooter());
 
     //intake
     driverController.leftBumper().onTrue(new RunIntakeAuto().alongWith(new SlowAgitator()));
@@ -287,7 +287,7 @@ public class RobotContainer {
     public void registerNamedCommands() {
         /* Command registration for PathPlanner */     
         NamedCommands.registerCommand("LowerIntake", new AutoLowerIntake().withTimeout(0.01));
-        NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooterAndHood());
+        NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooter());
         NamedCommands.registerCommand("AimToShoot", new AimToShootPoseOnly());
         NamedCommands.registerCommand("ShootCommand", (new ShooterAdderCommand(Constants.Shooter.ShooterSpeed.ShooterAdder).withTimeout(0.25).andThen(new ShooterAdderCommand(0))).alongWith(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.squeeze)))));
         NamedCommands.registerCommand("RunIntake", new RunIntake());
