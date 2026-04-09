@@ -114,10 +114,8 @@ public class AimToShootPoseOnly extends Command {
                             .withVelocityX(driverVx)
                             .withVelocityY(driverVy));
 
-            if (RobotContainer.poseEst.getIsSafe()) {
-                RobotContainer.hood.setTargetPosition(hoodPosition);
-                RobotContainer.hood.positionControl();
-            }
+            RobotContainer.hood.setTargetPosition(hoodPosition);
+            RobotContainer.hood.positionControl();
 
             SmartDashboard.putNumber("SOTM_TOF", tof);
             SmartDashboard.putNumber("SOTM_AngularRate", angularRate);
