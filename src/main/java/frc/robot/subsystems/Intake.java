@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.DeviceIds;
+import frc.robot.util.MatchLog;
 
 public class Intake extends SubsystemBase {
 
@@ -19,6 +20,7 @@ public class Intake extends SubsystemBase {
     private TalonFXConfiguration intakeFXConfig = new TalonFXConfiguration();
     private TalonFX intakeKrakenFollower = new TalonFX(DeviceIds.Intake.FollowerMotorId, "canivore");
     private TorqueCurrentFOC torqueDutyCycle = new TorqueCurrentFOC(0);
+    private double prevSpeed = 0;
 
 
 	public Intake() {
@@ -32,7 +34,7 @@ public class Intake extends SubsystemBase {
 
         /* Current Limiting */
         intakeFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        intakeFXConfig.CurrentLimits.StatorCurrentLimit = 40;
+        intakeFXConfig.CurrentLimits.StatorCurrentLimit = 60;
 
         /* PID Config */
         intakeFXConfig.Slot0.kP = 0.2;
@@ -40,11 +42,11 @@ public class Intake extends SubsystemBase {
         intakeFXConfig.Slot0.kD = 0;
 
         /* Open and Closed Loop Ramping */
-        intakeFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.25;
-        intakeFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.25;
+        intakeFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.1;
+        intakeFXConfig.OpenLoopRamps.VoltageOpenLoopRampPeriod = 0.1;
 
-        intakeFXConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.25;
-        intakeFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.25;
+        intakeFXConfig.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = 0.1;
+        intakeFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0.1;
 
         // Config Motor
         intakeKraken.getConfigurator().apply(intakeFXConfig);
@@ -53,13 +55,23 @@ public class Intake extends SubsystemBase {
 	}
 
 	public void setSpeed(double speed) {
-        //this.intakeKraken.set(speed);
+        boolean wasRunning = prevSpeed != 0;
+        boolean isRunning = speed != 0;
+        boolean directionChanged = wasRunning && isRunning && (Math.signum(speed) != Math.signum(prevSpeed));
+        if (!wasRunning && isRunning) {
+            MatchLog.event("intake/speed", String.format("start speed=%.2f", speed));
+        } else if (wasRunning && !isRunning) {
+            MatchLog.event("intake/speed", "stop");
+        } else if (directionChanged) {
+            MatchLog.event("intake/speed", String.format("reverse %.2f -> %.2f", prevSpeed, speed));
+        }
+        prevSpeed = speed;
 
         if (speed > 0) {
-            torqueDutyCycle.withOutput(40).withDeadband(1).withMaxAbsDutyCycle(speed);
+            torqueDutyCycle.withOutput(60).withDeadband(1).withMaxAbsDutyCycle(speed);
         }
         else {
-            torqueDutyCycle.withOutput(-40).withDeadband(1).withMaxAbsDutyCycle(-speed);
+            torqueDutyCycle.withOutput(-60).withDeadband(1).withMaxAbsDutyCycle(-speed);
         }
         
         this.intakeKraken.setControl(torqueDutyCycle);

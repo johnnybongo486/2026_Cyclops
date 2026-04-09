@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.util.MatchLog;
 
 public class AimToShootPoseOnly extends Command {
 
@@ -27,6 +28,7 @@ public class AimToShootPoseOnly extends Command {
     private double pointAngle = 0;
     private boolean isPassingMode = false;
     private double shooterAdder = 0;
+    private boolean prevPassingMode = false;
 
     public AimToShootPoseOnly() {
         addRequirements(RobotContainer.shooter);
@@ -42,6 +44,8 @@ public class AimToShootPoseOnly extends Command {
     }
 
     public void initialize() {
+        prevPassingMode = RobotContainer.poseEst.getPassingMode();
+        MatchLog.event("cmd/aimToShoot", prevPassingMode ? "start mode=pass" : "start mode=shoot");
     }
 
     @Override
@@ -51,6 +55,12 @@ public class AimToShootPoseOnly extends Command {
         newThetaPass = RobotContainer.poseEst.aimToPass();
         currentAngle = RobotContainer.drivetrain.getState().Pose.getRotation().getDegrees();
         isPassingMode = RobotContainer.poseEst.getPassingMode();
+
+        if (isPassingMode != prevPassingMode) {
+            MatchLog.event("cmd/aimToShoot/modeChange",
+                isPassingMode ? "shoot->pass" : "pass->shoot");
+            prevPassingMode = isPassingMode;
+        }
 
         // Robot velocity in field frame (m/s) — from swerve state, much cleaner than finite diff
         double vx = RobotContainer.drivetrain.getXSpeed();
@@ -186,9 +196,10 @@ public class AimToShootPoseOnly extends Command {
     }
 
     protected void end() {
+        MatchLog.event("cmd/aimToShoot", "end");
     }
 
     protected void interrupted() {
-        end();
+        MatchLog.event("cmd/aimToShoot", "interrupted");
     }
 }

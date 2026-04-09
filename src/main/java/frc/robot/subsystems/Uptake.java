@@ -10,12 +10,14 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.DeviceIds;
+import frc.robot.util.MatchLog;
 
 public class Uptake extends SubsystemBase {
 
 	private TalonFX uptakeKraken = new TalonFX(DeviceIds.Serializer.UptakeMotorId, "canivore");
     private TalonFXConfiguration uptakeFXConfig = new TalonFXConfiguration();
     private TorqueCurrentFOC torqueDutyCycle = new TorqueCurrentFOC(0);
+    private double prevSpeed = 0;
 
 	public Uptake() {
         /** Shooter Motor Configuration */
@@ -45,6 +47,12 @@ public class Uptake extends SubsystemBase {
 	}
 
 	public void setSpeed(double speed) {
+        if (prevSpeed == 0 && speed != 0) {
+            MatchLog.event("uptake/speed", String.format("start speed=%.2f", speed));
+        } else if (prevSpeed != 0 && speed == 0) {
+            MatchLog.event("uptake/speed", "stop");
+        }
+        prevSpeed = speed;
         torqueDutyCycle.withOutput(60).withDeadband(1).withMaxAbsDutyCycle(speed);
         this.uptakeKraken.setControl(torqueDutyCycle);
 	}

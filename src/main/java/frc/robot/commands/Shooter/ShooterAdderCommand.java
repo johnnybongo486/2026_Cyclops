@@ -2,6 +2,7 @@ package frc.robot.commands.Shooter;
 
 import frc.robot.RobotContainer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.util.MatchLog;
 
 public class ShooterAdderCommand extends Command {
 	private double shooterVelocity = 0;
@@ -13,6 +14,12 @@ public class ShooterAdderCommand extends Command {
 	// Called just before this Command runs the first time
 	public void initialize() {
 		RobotContainer.shooter.setShooterAdder(shooterVelocity);
+		if (shooterVelocity != 0) {
+			MatchLog.event("cmd/shoot/fire",
+				String.format("adder=%.2f baseVel=%.2f", shooterVelocity, RobotContainer.shooter.getTargetVelocity()));
+		} else {
+			MatchLog.event("cmd/shoot/adderCleared");
+		}
 	}
 
 	// Called repeatedly when this Command is scheduled to run

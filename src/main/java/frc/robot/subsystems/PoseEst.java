@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.LimelightHelpers;
 import frc.robot.RobotContainer;
+import frc.robot.util.MatchLog;
 
 public class PoseEst extends SubsystemBase{
 
@@ -58,10 +59,14 @@ public class PoseEst extends SubsystemBase{
     private double time;
     private double timeLeft;
     private boolean rejectLL;
-    private double safeMinR;
-    private double safeMaxR;
-    private double safeMinB;
-    private double safeMaxB;
+
+    // Edge-trigger state for vision logging — only log on transitions, not every loop
+    private int prevTagCountLeft = 0;
+    private int prevTagCountRight = 0;
+    private int prevTagCountShooter = 0;
+    private boolean prevSpinRejection = false;
+    private boolean prevAllCamerasNull = false;
+
     private double safeMinIntakeR;
     private double safeMaxIntakeR;
     private double safeMinIntakeB;
@@ -101,26 +106,53 @@ public class PoseEst extends SubsystemBase{
 
         if (alliance.isPresent()) {
 
-            if(mt2LeftBlue != null && mt2RightBlue != null && mt2ShooterBlue != null) { // make sure we have the camera        
-                if(Math.abs(RobotContainer.drivetrain.getPigeon2().getAngularVelocityZDevice().getValueAsDouble()) > 720) {// if our angular velocity is greater than 720 degrees per second, ignore vision updates
+            if(mt2LeftBlue != null && mt2RightBlue != null && mt2ShooterBlue != null) { // make sure we have the camera
+                prevAllCamerasNull = false;
+
+                double angVel = RobotContainer.drivetrain.getPigeon2().getAngularVelocityZDevice().getValueAsDouble();
+                boolean spinning = Math.abs(angVel) > 720;
+                if (spinning && !prevSpinRejection) {
+                    MatchLog.event("vision/spinRejection", String.format("angVel=%.1f deg/s", angVel));
+                }
+                prevSpinRejection = spinning;
+                if (spinning) { // if our angular velocity is greater than 720 degrees per second, ignore vision updates
                     doRejectUpdateLeft = true;
                     doRejectUpdateRight = true;
                     doRejectUpdateShooter = true;
                 }
-                 
-                if(mt2LeftBlue.tagCount == 0) {
-                    doRejectUpdateLeft = true;
-                }
 
+                if(mt2LeftBlue.tagCount == 0) {
+                    if (prevTagCountLeft > 0) {
+                        MatchLog.event("vision/left/tagDrop", "prevCount=" + prevTagCountLeft);
+                    }
+                    doRejectUpdateLeft = true;
+                } else if (prevTagCountLeft == 0) {
+                    MatchLog.event("vision/left/tagReacquire",
+                        String.format("count=%d dist=%.2fm", mt2LeftBlue.tagCount, mt2LeftBlue.avgTagDist));
+                }
+                prevTagCountLeft = mt2LeftBlue.tagCount;
 
                 if(mt2RightBlue.tagCount == 0) {
+                    if (prevTagCountRight > 0) {
+                        MatchLog.event("vision/right/tagDrop", "prevCount=" + prevTagCountRight);
+                    }
                     doRejectUpdateRight = true;
+                } else if (prevTagCountRight == 0) {
+                    MatchLog.event("vision/right/tagReacquire",
+                        String.format("count=%d dist=%.2fm", mt2RightBlue.tagCount, mt2RightBlue.avgTagDist));
                 }
-
+                prevTagCountRight = mt2RightBlue.tagCount;
 
                 if(mt2ShooterBlue.tagCount == 0) {
+                    if (prevTagCountShooter > 0) {
+                        MatchLog.event("vision/shooter/tagDrop", "prevCount=" + prevTagCountShooter);
+                    }
                     doRejectUpdateShooter = true;
+                } else if (prevTagCountShooter == 0) {
+                    MatchLog.event("vision/shooter/tagReacquire",
+                        String.format("count=%d dist=%.2fm", mt2ShooterBlue.tagCount, mt2ShooterBlue.avgTagDist));
                 }
+                prevTagCountShooter = mt2ShooterBlue.tagCount;
 
                 if(!doRejectUpdateLeft) {
                     RobotContainer.drivetrain.addVisionMeasurement(mt2LeftBlue.pose, mt2LeftBlue.timestampSeconds, VecBuilder.fill(RobotContainer.standardDeviation,RobotContainer.standardDeviation,99999)); // n1: 0.7
@@ -136,8 +168,15 @@ public class PoseEst extends SubsystemBase{
             } 
             
             else {
-                System.out.println("PoseEst.java: mt2LeftBlue is null and mt2RightBlue is null");
-            }  
+                if (!prevAllCamerasNull) {
+                    MatchLog.event("vision/camerasNull",
+                        String.format("left=%s right=%s shooter=%s",
+                            mt2LeftBlue == null ? "null" : "ok",
+                            mt2RightBlue == null ? "null" : "ok",
+                            mt2ShooterBlue == null ? "null" : "ok"));
+                }
+                prevAllCamerasNull = true;
+            }
         }
 
         else{

@@ -21,7 +21,7 @@ public final class Constants {
   public static class Intake{
     public static class IntakeRoller{
       public static final double IntakeRunSpeed = 1.0;  // 1.0
-      public static final double IntakeReverseSpeed = -1;
+      public static final double IntakeReverseSpeed = -0.5;
       public static final double IntakeStopSpeed = 0.0;
     }
     public static class IntakeWrist{

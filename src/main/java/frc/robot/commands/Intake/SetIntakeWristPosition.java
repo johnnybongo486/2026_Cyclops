@@ -2,6 +2,7 @@ package frc.robot.commands.Intake;
 
 import frc.robot.RobotContainer;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.util.MatchLog;
 
 public class SetIntakeWristPosition extends Command {
 	private double intakeWristPosition = 0;
@@ -29,12 +30,16 @@ public class SetIntakeWristPosition extends Command {
 
 	// Called once after isFinished returns true
 	protected void end() {
-
+		MatchLog.event("cmd/intakeWrist/inPosition",
+			String.format("target=%.3f actual=%.3f rot",
+				intakeWristPosition, RobotContainer.intakeWrist.getCurrentPosition()));
 	}
 
 	// Called when another command which requires one or more of the same
 	// subsystems is scheduled to run
 	protected void interrupted() {
-
+		MatchLog.event("cmd/intakeWrist/interrupted",
+			String.format("target=%.3f actual=%.3f rot",
+				intakeWristPosition, RobotContainer.intakeWrist.getCurrentPosition()));
 	}
 }

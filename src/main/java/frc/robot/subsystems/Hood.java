@@ -14,6 +14,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.util.MatchLog;
 
 public class Hood extends SubsystemBase implements IPositionControlledSubsystem {
 
@@ -50,9 +51,9 @@ public class Hood extends SubsystemBase implements IPositionControlledSubsystem 
         hoodFXConfig.CurrentLimits.StatorCurrentLimit = 20;
 
         /* PID Config */
-        hoodFXConfig.Slot0.kP = 0.9;
+        hoodFXConfig.Slot0.kP = 0.2;
         hoodFXConfig.Slot0.kI = 0;
-        hoodFXConfig.Slot0.kD = 0.02;
+        hoodFXConfig.Slot0.kD = 0.01;
 
         /* Open and Closed Loop Ramping */
         hoodFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.25;
@@ -62,8 +63,8 @@ public class Hood extends SubsystemBase implements IPositionControlledSubsystem 
         hoodFXConfig.ClosedLoopRamps.VoltageClosedLoopRampPeriod = 0;
 
         //Config Acceleration and Velocity
-        hoodFXConfig.MotionMagic.withMotionMagicAcceleration(900);
-        hoodFXConfig.MotionMagic.withMotionMagicCruiseVelocity(900);
+        hoodFXConfig.MotionMagic.withMotionMagicAcceleration(300);
+        hoodFXConfig.MotionMagic.withMotionMagicCruiseVelocity(300);
 
         // Config Motor
         hoodKraken.getConfigurator().apply(hoodFXConfig);
@@ -105,12 +106,20 @@ public class Hood extends SubsystemBase implements IPositionControlledSubsystem 
 		if (!isValidPosition(position)) {
 			return false;
 		} else {
+			if (position != this.targetPosition) {
+				MatchLog.event("hood/targetPosition",
+					String.format("%.3f -> %.3f rot", this.targetPosition, position));
+			}
 			this.targetPosition = position;
 			return true;
 		}
 	}
 
 	public void forceSetTargetPosition(double position) {
+		if (position != this.targetPosition) {
+			MatchLog.event("hood/targetPosition",
+				String.format("%.3f -> %.3f rot (forced)", this.targetPosition, position));
+		}
 		this.targetPosition = position;
 	}
 
