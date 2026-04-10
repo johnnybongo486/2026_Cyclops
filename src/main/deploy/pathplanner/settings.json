@@ -3,9 +3,11 @@
   "robotLength": 0.7747,
   "holonomicMode": true,
   "pathFolders": [
+    "Archive",
+    "DoubleShotLeftSafe",
     "DoubleShotRightSafe",
     "DoubleShotRightSteal",
-    "Archive"
+    "DoubleShotLeftSteal"
   ],
   "autoFolders": [
     "Archive"
@@ -17,8 +19,8 @@
   "defaultNominalVoltage": 12.0,
   "robotMass": 68.04,
   "robotMOI": 6.883,
-  "robotTrackwidth": 0.6286,
-  "driveWheelRadius": 0.05207,
+  "robotTrackwidth": 0.546,
+  "driveWheelRadius": 0.051,
   "driveGearing": 6.0267857,
   "maxDriveSpeed": 5.12,
   "driveMotorType": "krakenX60",
