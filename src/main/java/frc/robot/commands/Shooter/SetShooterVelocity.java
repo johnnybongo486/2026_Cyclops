@@ -22,7 +22,10 @@ public class SetShooterVelocity extends Command {
 		RobotContainer.shooter.velocityControl();
 	}
 
-	// Make this return true when this Command no longer needs to run execute()
+	// Hold velocity for as long as the command is scheduled. Ending on reaching
+	// the setpoint causes the parallel group (used in fixed-shot bindings) to
+	// finish, after which Phoenix 6 control packets time out and the shooter
+	// neutralizes mid-shot. Reaching the setpoint is "ready", not "done".
 	public boolean isFinished() {
 			return false; //RobotContainer.shooter.isAtVelocity(shooterVelocity);
 	}

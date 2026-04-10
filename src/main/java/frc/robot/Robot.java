@@ -16,6 +16,11 @@ public class Robot extends TimedRobot {
 
   public static RobotContainer robotContainer;
 
+  // Dashboard updates run at ~10 Hz instead of the 50 Hz robot loop. Pushing
+  // ~25 NetworkTables values every 20 ms is unnecessary bandwidth.
+  private int dashboardCounter = 0;
+  private static final int DASHBOARD_UPDATE_PERIOD = 5;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -35,14 +40,20 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
-    RobotContainer.intakeWrist.updateDashboard();
-    RobotContainer.hood.updateDashboard();
-    RobotContainer.shooter.updateDashboard();
+    // Pose estimation must run every loop for accurate vision fusion
     RobotContainer.poseEst.updatePose();
-    RobotContainer.poseEst.updateDashboard();
-    RobotContainer.intake.updateDashboard();
-    RobotContainer.uptake.updateDashboard();
-    RobotContainer.agitator.updateDashboard();
+
+    // Dashboard pushes throttled to ~10 Hz
+    if (++dashboardCounter >= DASHBOARD_UPDATE_PERIOD) {
+      dashboardCounter = 0;
+      RobotContainer.intakeWrist.updateDashboard();
+      RobotContainer.hood.updateDashboard();
+      RobotContainer.shooter.updateDashboard();
+      RobotContainer.poseEst.updateDashboard();
+      RobotContainer.intake.updateDashboard();
+      RobotContainer.uptake.updateDashboard();
+      RobotContainer.agitator.updateDashboard();
+    }
 
     // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,

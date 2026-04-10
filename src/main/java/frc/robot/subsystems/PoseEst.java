@@ -346,9 +346,9 @@ public class PoseEst extends SubsystemBase{
         // getPassingMode() first to update the stale passingMode field.
         boolean currentlyPassing = getPassingMode();
 
-        if (DriverStation.getAlliance().isPresent() == true) {
+        if (alliance.isPresent()) {
 
-            if (DriverStation.getAlliance().get() == Alliance.Red) {
+            if (alliance.get() == Alliance.Red) {
                 if (!currentlyPassing) {
                     xH = targetHubPoseRed.getX();
                     yH = targetHubPoseRed.getY();
