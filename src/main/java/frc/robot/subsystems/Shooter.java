@@ -4,6 +4,8 @@ import frc.robot.DeviceIds;
 import frc.robot.Robot;
 import frc.lib.models.*;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -11,6 +13,9 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,7 +39,7 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
     public double targetVelocity = 0;
 	private double arbitraryFeedForward = 0.0;
 
-	private final static double onTargetThreshold = 0.01;
+	private final static double onTargetThreshold = 0.5;
 
 	public double shooterAdder = 0;
 
@@ -44,18 +49,17 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
     public TalonFX rightShooterKrakenFollower = new TalonFX(DeviceIds.Shooter.FollowerRightMotorId, "canivore");
 	public TalonFXConfiguration shooterFXConfig = new TalonFXConfiguration();
 
+	// Cached status signals — refreshed once per loop in periodic().
+	private final StatusSignal<AngularVelocity> velocitySignal;
+	private final StatusSignal<Current> supplyCurrentSignal;
+
 	public Shooter() {
         // Clear Sticky Faults
 		this.leftShooterKraken.clearStickyFaults();
 		this.leftShooterKrakenFollower.clearStickyFaults();
 		this.rightShooterKraken.clearStickyFaults();
 		this.rightShooterKrakenFollower.clearStickyFaults();
-		
-        // Set Followers
-		this.leftShooterKrakenFollower.setControl(new Follower(DeviceIds.Shooter.LeadLeftMotorId, MotorAlignmentValue.Aligned));
-		this.rightShooterKraken.setControl(new Follower(DeviceIds.Shooter.LeadLeftMotorId, MotorAlignmentValue.Opposed));
-		this.rightShooterKrakenFollower.setControl(new Follower(DeviceIds.Shooter.LeadLeftMotorId, MotorAlignmentValue.Opposed));
-		
+
 		/** Shooter Motor Configuration */
         /* Motor Inverts and Neutral Mode */
 		shooterFXConfig.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
@@ -84,17 +88,31 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 		
 		// Enable FOC
 		targetVelocityDutyCycle.withEnableFOC(true);
-		
-		// Set Peak Torque Current
-		shooterFXConfig.TorqueCurrent.PeakForwardTorqueCurrent = 40;
-		shooterFXConfig.TorqueCurrent.PeakReverseTorqueCurrent = 40;
 
-        // Config Motor
+        // Config all four motors with the same config (current limits, gains, ramps)
         leftShooterKraken.getConfigurator().apply(shooterFXConfig);
+        leftShooterKrakenFollower.getConfigurator().apply(shooterFXConfig);
+        rightShooterKraken.getConfigurator().apply(shooterFXConfig);
+        rightShooterKrakenFollower.getConfigurator().apply(shooterFXConfig);
+
         leftShooterKraken.getConfigurator().setPosition(0.0);
 		leftShooterKrakenFollower.getConfigurator().setPosition(0);
 		rightShooterKraken.getConfigurator().setPosition(0.0);
 		rightShooterKrakenFollower.getConfigurator().setPosition(0);
+
+        // Set Followers (after config so followers inherit current limits)
+		this.leftShooterKrakenFollower.setControl(new Follower(DeviceIds.Shooter.LeadLeftMotorId, MotorAlignmentValue.Aligned));
+		this.rightShooterKraken.setControl(new Follower(DeviceIds.Shooter.LeadLeftMotorId, MotorAlignmentValue.Opposed));
+		this.rightShooterKrakenFollower.setControl(new Follower(DeviceIds.Shooter.LeadLeftMotorId, MotorAlignmentValue.Opposed));
+
+		// Cache status signals (only the lead motor — followers mirror it)
+		velocitySignal = leftShooterKraken.getVelocity();
+		supplyCurrentSignal = leftShooterKraken.getSupplyCurrent();
+	}
+
+	@Override
+	public void periodic() {
+		BaseStatusSignal.refreshAll(velocitySignal, supplyCurrentSignal);
 	}
 
 	public void velocityControl() {
@@ -103,7 +121,7 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 	}
 
 	public double getCurrentDraw() {
-		return this.leftShooterKraken.getSupplyCurrent().getValueAsDouble();
+		return supplyCurrentSignal.getValueAsDouble();
 	}
 
 	public boolean isHoldingVelocity() {
@@ -191,8 +209,7 @@ public class Shooter extends SubsystemBase implements IVelocityControlledSubsyst
 
 	@Override
 	public double getCurrentVelocity() {
-		double currentVelocity = this.leftShooterKraken.getVelocity().getValueAsDouble();
-		return currentVelocity;
+		return velocitySignal.getValueAsDouble();
 	}
 
 	@Override

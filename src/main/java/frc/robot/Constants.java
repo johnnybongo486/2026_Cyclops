@@ -25,17 +25,17 @@ public final class Constants {
       public static final double IntakeStopSpeed = 0.0;
     }
     public static class IntakeWrist{
-      public static double StoreIntakePosition = 0.0;
-      public static double RunIntakePosition = 6.25;  // todo
-      public static double squeeze = 2;
+      public static final double StoreIntakePosition = 0.0;
+      public static final double RunIntakePosition = 6.25;  // todo
+      public static final double squeeze = 2;
 
     }
   }
 
   public static class Shooter{
     public static class Hood {
-      public static double StoreHoodPosition = 0.0;
-      public static double FullUpPosition = 12;
+      public static final double StoreHoodPosition = 0.0;
+      public static final double FullUpPosition = 12;
     }
     public static class HoodShooting {
       public static double a = -0.41557407878887015;
