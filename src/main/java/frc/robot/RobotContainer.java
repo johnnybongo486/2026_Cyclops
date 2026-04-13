@@ -127,6 +127,7 @@ public class RobotContainer {
     registerNamedCommands();
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto settings");
+    /*
     autoChooser.addOption("DoubleShotRightSteal", new PathPlannerAuto("DoubleShotRightSteal"));
     autoChooser.addOption("DoubleShotRightLose", new PathPlannerAuto("DoubleShotRightLose"));
     autoChooser.addOption("DoubleShotRightSafe", new PathPlannerAuto("DoubleShotRightSafe"));
@@ -144,6 +145,12 @@ public class RobotContainer {
     autoChooser.addOption("ShortDoubleShotLeftSteal", new PathPlannerAuto("ShortDoubleShotLeftSteal"));
     autoChooser.addOption("ShortDoubleShotLeftSafe", new PathPlannerAuto("ShortDoubleShotLeftSafe"));
     autoChooser.addOption("ShortDoubleShotLeftLose", new PathPlannerAuto("ShortDoubleShotLeftLose"));
+    */
+
+    autoChooser.addOption("DCMPDoubleShotRightSafe", new PathPlannerAuto("DCMPDoubleShotRightSafe"));
+    autoChooser.addOption("DCMPShortDoubleShotRightSafe", new PathPlannerAuto("DCMPShortDoubleShotRightSafe"));
+    autoChooser.addOption("DCMPShortDoubleShotRightSteal", new PathPlannerAuto("DCMPShortDoubleShotRightSteal"));
+
 
     autoTab.add("Mode", autoChooser);
     

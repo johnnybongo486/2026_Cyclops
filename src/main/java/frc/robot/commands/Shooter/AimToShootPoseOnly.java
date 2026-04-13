@@ -148,7 +148,7 @@ public class AimToShootPoseOnly extends Command {
             double radialSpeed = (vx * Math.cos(thetaPassRad) + vy * Math.sin(thetaPassRad));
 
             pointAngle -= angularRate * tof;
-            tDistance = Math.max(newDistance - radialSpeed * tof, 0.5);
+            tDistance = Math.max(newDistance - radialSpeed * (tof/2), 0.5);
 
             // PROTOTYPE MODE: rotate drivetrain to the heading the turret would have aimed at.
             double targetHeadingDeg = currentAngle - pointAngle;

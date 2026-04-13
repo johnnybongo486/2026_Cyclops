@@ -24,7 +24,7 @@ public class SetShooterVelocity extends Command {
 
 	// Make this return true when this Command no longer needs to run execute()
 	public boolean isFinished() {
-			return RobotContainer.shooter.isAtVelocity(shooterVelocity);
+			return false; //RobotContainer.shooter.isAtVelocity(shooterVelocity);
 	}
 
 	// Called once after isFinished returns true
