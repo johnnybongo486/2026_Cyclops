@@ -5,11 +5,17 @@ import frc.robot.Constants;
 import frc.robot.DeviceIds;
 import frc.robot.Robot;
 
+import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicDutyCycle;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -35,6 +41,12 @@ public class Hood extends SubsystemBase implements IPositionControlledSubsystem 
 	private TalonFX hoodKraken = new TalonFX(DeviceIds.Shooter.HoodMotorId, "canivore");
 
     private TalonFXConfiguration hoodFXConfig = new TalonFXConfiguration();
+
+    // Cached status signals — refreshed once per loop in periodic() instead of
+    // re-fetched on every accessor call.
+    private final StatusSignal<Angle> positionSignal;
+    private final StatusSignal<AngularVelocity> velocitySignal;
+    private final StatusSignal<Current> supplyCurrentSignal;
 
 	public Hood() {
 		// Clear Sticky Faults
@@ -68,11 +80,21 @@ public class Hood extends SubsystemBase implements IPositionControlledSubsystem 
         // Config Motor
         hoodKraken.getConfigurator().apply(hoodFXConfig);
         hoodKraken.getConfigurator().setPosition(0.0);
-		
+
 		// Enable FOC
 		targetPositionDutyCycle.withEnableFOC(true);
 
 		resethoodEncoder();
+
+		// Cache status signals
+		positionSignal = hoodKraken.getRotorPosition();
+		velocitySignal = hoodKraken.getVelocity();
+		supplyCurrentSignal = hoodKraken.getSupplyCurrent();
+	}
+
+	@Override
+	public void periodic() {
+		BaseStatusSignal.refreshAll(positionSignal, velocitySignal, supplyCurrentSignal);
 	}
 
 	public void positionControl() {
@@ -82,11 +104,11 @@ public class Hood extends SubsystemBase implements IPositionControlledSubsystem 
 	}
 
 	public double getCurrentPosition() {
-		return this.hoodKraken.getRotorPosition().getValueAsDouble();
+		return positionSignal.getValueAsDouble();
 	}
 
 	public double getCurrentDraw() {
-		return this.hoodKraken.getSupplyCurrent().getValueAsDouble();
+		return supplyCurrentSignal.getValueAsDouble();
 	}
 
 	public boolean isHoldingPosition() {
@@ -162,16 +184,6 @@ public class Hood extends SubsystemBase implements IPositionControlledSubsystem 
 		return positionError;
 	}
 
-	public void manageMotion(double targetPosition) {
-		double currentPosition = getCurrentPosition();
-		if (currentPosition < targetPosition) {
-				// set based on gravity
-		}
-		else {
-				//set based on gravity
-		}
-	}
-
 	public void zeroTarget() {
 		targetPosition = 0;
 	}
@@ -186,8 +198,7 @@ public class Hood extends SubsystemBase implements IPositionControlledSubsystem 
 
 	@Override
 	public double getCurrentVelocity() {
-		double currentVelocity = this.hoodKraken.getVelocity().getValueAsDouble();
-		return currentVelocity;
+		return velocitySignal.getValueAsDouble();
 	}
 
 	@Override

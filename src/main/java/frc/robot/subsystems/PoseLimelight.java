@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.LimelightHelpers;
 import frc.robot.DeviceIds;
@@ -76,39 +74,21 @@ public class PoseLimelight extends SubsystemBase {
    }
 
    public void updateLLPositions(){
+      // Camera robot-relative offsets depend on the robot's physical starting orientation,
+      // not on alliance color. The "red*" and "blue*" constant sets are 180-deg mirrors of
+      // each other (Forward/Right/Yaw are sign-flipped). The operator toggle is the source
+      // of truth for which way the robot is facing at start.
       boolean isFacingBlue = RobotContainer.poseEst.getStartingPose();
 
-      if (DriverStation.getAlliance().isPresent() == true) {
-         if (DriverStation.getAlliance().get() == Alliance.Blue) {
-            if (isFacingBlue == true) {
-               LimelightHelpers.setCameraPose_RobotSpace("limelight-left", redLLForwardLeft, redLLRightLeft, redLLUpLeft, redLLRollLeft, redLLPitchLeft, redLLYawLeft);
-               LimelightHelpers.setCameraPose_RobotSpace("limelight-right", redLLForwardRight, redLLRightRight, redLLUpRight, redLLRollRight, redLLPitchRight, redLLYawRight);
-               LimelightHelpers.setCameraPose_RobotSpace("limelight-shooter", redLLForwardShooter, redLLRightShooter, redLLUpShooter, redLLRollShooter, redLLPitchShooter, redLLYawShooter);
-            }
-            else {
-               LimelightHelpers.setCameraPose_RobotSpace("limelight-left", blueLLForwardLeft, blueLLRightLeft, blueLLUpLeft, blueLLRollLeft, blueLLPitchLeft, blueLLYawLeft);
-               LimelightHelpers.setCameraPose_RobotSpace("limelight-right", blueLLForwardRight, blueLLRightRight, blueLLUpRight, blueLLRollRight, blueLLPitchRight, blueLLYawRight);
-               LimelightHelpers.setCameraPose_RobotSpace("limelight-shooter", blueLLForwardShooter, blueLLRightShooter, blueLLUpShooter, blueLLRollShooter, blueLLPitchShooter, blueLLYawShooter);
-            }
-
-         }
-
-         else if (DriverStation.getAlliance().get() == Alliance.Red) {
-            if (isFacingBlue == true) {
-               LimelightHelpers.setCameraPose_RobotSpace("limelight-left", redLLForwardLeft, redLLRightLeft, redLLUpLeft, redLLRollLeft, redLLPitchLeft, redLLYawLeft);
-               LimelightHelpers.setCameraPose_RobotSpace("limelight-right", redLLForwardRight, redLLRightRight, redLLUpRight, redLLRollRight, redLLPitchRight, redLLYawRight);
-               LimelightHelpers.setCameraPose_RobotSpace("limelight-shooter", redLLForwardShooter, redLLRightShooter, redLLUpShooter, redLLRollShooter, redLLPitchShooter, redLLYawShooter);
-            }
-            else {
-               LimelightHelpers.setCameraPose_RobotSpace("limelight-left", blueLLForwardLeft, blueLLRightLeft, blueLLUpLeft, blueLLRollLeft, blueLLPitchLeft, blueLLYawLeft);
-               LimelightHelpers.setCameraPose_RobotSpace("limelight-right", blueLLForwardRight, blueLLRightRight, blueLLUpRight, blueLLRollRight, blueLLPitchRight, blueLLYawRight);
-               LimelightHelpers.setCameraPose_RobotSpace("limelight-shooter", blueLLForwardShooter, blueLLRightShooter, blueLLUpShooter, blueLLRollShooter, blueLLPitchShooter, blueLLYawShooter);
-            }
-         }
+      if (isFacingBlue) {
+         LimelightHelpers.setCameraPose_RobotSpace("limelight-left", redLLForwardLeft, redLLRightLeft, redLLUpLeft, redLLRollLeft, redLLPitchLeft, redLLYawLeft);
+         LimelightHelpers.setCameraPose_RobotSpace("limelight-right", redLLForwardRight, redLLRightRight, redLLUpRight, redLLRollRight, redLLPitchRight, redLLYawRight);
+         LimelightHelpers.setCameraPose_RobotSpace("limelight-shooter", redLLForwardShooter, redLLRightShooter, redLLUpShooter, redLLRollShooter, redLLPitchShooter, redLLYawShooter);
       }
-
-      else{
-
+      else {
+         LimelightHelpers.setCameraPose_RobotSpace("limelight-left", blueLLForwardLeft, blueLLRightLeft, blueLLUpLeft, blueLLRollLeft, blueLLPitchLeft, blueLLYawLeft);
+         LimelightHelpers.setCameraPose_RobotSpace("limelight-right", blueLLForwardRight, blueLLRightRight, blueLLUpRight, blueLLRollRight, blueLLPitchRight, blueLLYawRight);
+         LimelightHelpers.setCameraPose_RobotSpace("limelight-shooter", blueLLForwardShooter, blueLLRightShooter, blueLLUpShooter, blueLLRollShooter, blueLLPitchShooter, blueLLYawShooter);
       }
    }
 
