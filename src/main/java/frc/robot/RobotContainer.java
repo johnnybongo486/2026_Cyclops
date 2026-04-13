@@ -160,7 +160,7 @@ public class RobotContainer {
     intake.setDefaultCommand(new RunIntakeAuto());
 
     // for pit testing, comment out the hood command below and uncomment the intake command below
-    hood.setDefaultCommand(new ContinuousSetShooter());
+    shooter.setDefaultCommand(new ContinuousSetShooter());
     // intake.setDefaultCommand(new StopIntake());
 
     
