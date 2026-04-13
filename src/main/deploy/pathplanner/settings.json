@@ -3,9 +3,11 @@
   "robotLength": 0.7747,
   "holonomicMode": true,
   "pathFolders": [
+    "Archive",
+    "DoubleShotLeftSafe",
     "DoubleShotRightSafe",
     "DoubleShotRightSteal",
-    "Archive"
+    "DoubleShotLeftSteal"
   ],
   "autoFolders": [
     "Archive"
