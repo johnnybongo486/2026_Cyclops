@@ -150,6 +150,7 @@ public class RobotContainer {
     autoChooser.addOption("DCMPDoubleShotRightSafe", new PathPlannerAuto("DCMPDoubleShotRightSafe"));
     autoChooser.addOption("DCMPShortDoubleShotRightSafe", new PathPlannerAuto("DCMPShortDoubleShotRightSafe"));
     autoChooser.addOption("DCMPShortDoubleShotRightSteal", new PathPlannerAuto("DCMPShortDoubleShotRightSteal"));
+    autoChooser.addOption("DCMPDoubleShotRightSteal", new PathPlannerAuto("DCMPDoubleShotRightSteal"));
 
 
     autoTab.add("Mode", autoChooser);
