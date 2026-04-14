@@ -147,11 +147,33 @@ public class RobotContainer {
     autoChooser.addOption("ShortDoubleShotLeftLose", new PathPlannerAuto("ShortDoubleShotLeftLose"));
     */
 
-    autoChooser.addOption("DCMPDoubleShotRightSafe", new PathPlannerAuto("DCMPDoubleShotRightSafe"));
-    autoChooser.addOption("DCMPShortDoubleShotRightSafe", new PathPlannerAuto("DCMPShortDoubleShotRightSafe"));
-    autoChooser.addOption("DCMPShortDoubleShotRightSteal", new PathPlannerAuto("DCMPShortDoubleShotRightSteal"));
-    autoChooser.addOption("DCMPDoubleShotRightSteal", new PathPlannerAuto("DCMPDoubleShotRightSteal"));
+    autoChooser.addOption("Left_StealShort_NearShort_Wall", new PathPlannerAuto("Left_StealShort_NearShort_Wall"));
+    autoChooser.addOption("Left_StealShort_NearLong_Wall", new PathPlannerAuto("Left_StealShort_NearLong_Wall"));
+    autoChooser.addOption("Left_StealShort_FarLong_Wall", new PathPlannerAuto("Left_StealShort_FarLong_Wall"));
+    autoChooser.addOption("Left_FarShort_NearShort_Wall", new PathPlannerAuto("Left_FarShort_NearShort_Wall"));
+    autoChooser.addOption("Left_FarShort_NearLong_Wall", new PathPlannerAuto("Left_FarShort_NearLong_Wall"));
+    autoChooser.addOption("Left_FarShort_FarLong_Wall", new PathPlannerAuto("Left_FarShort_FarLong_Wall"));
+    autoChooser.addOption("Right_StealShort_NearShort_Wall", new PathPlannerAuto("Right_StealShort_NearShort_Wall"));
+    autoChooser.addOption("Right_StealShort_NearLong_Wall", new PathPlannerAuto("Right_StealShort_NearLong_Wall"));
+    autoChooser.addOption("Right_StealShort_FarLong_Wall", new PathPlannerAuto("Right_StealShort_FarLong_Wall"));    
+    autoChooser.addOption("Right_FarShort_NearShort_Wall", new PathPlannerAuto("Right_FarShort_NearShort_Wall"));
+    autoChooser.addOption("Right_FarShort_NearLong_Wall", new PathPlannerAuto("Right_FarShort_NearLong_Wall"));
+    autoChooser.addOption("Right_FarShort_FarLong_Wall", new PathPlannerAuto("Right_FarShort_FarLong_Wall"));
 
+    autoChooser.addOption("Left_StealShort_NearShort_Mid", new PathPlannerAuto("Left_StealShort_NearShort_Mid"));
+    autoChooser.addOption("Left_StealShort_NearLong_Mid", new PathPlannerAuto("Left_StealShort_NearLong_Mid"));
+    autoChooser.addOption("Left_StealShort_FarLong_MId", new PathPlannerAuto("Left_StealShort_FarLong_MId"));
+    autoChooser.addOption("Left_FarShort_NearShort_Mid", new PathPlannerAuto("Left_FarShort_NearShort_Mid"));
+    autoChooser.addOption("Left_FarShort_NearLong_Mid", new PathPlannerAuto("Left_FarShort_NearLong_Mid"));
+    autoChooser.addOption("Left_FarShort_FarLong_Mid", new PathPlannerAuto("Left_FarShort_FarLong_Mid"));
+    autoChooser.addOption("Right_StealShort_NearShort_Mid", new PathPlannerAuto("Right_StealShort_NearShort_Mid"));
+    autoChooser.addOption("Right_StealShort_NearLong_Mid", new PathPlannerAuto("Right_StealShort_NearLong_Mid"));
+    autoChooser.addOption("Right_StealShort_FarLong_Mid", new PathPlannerAuto("Right_StealShort_FarLong_Mid"));    
+    autoChooser.addOption("Right_FarShort_NearShort_Mid", new PathPlannerAuto("Right_FarShort_NearShort_Mid"));
+    autoChooser.addOption("Right_FarShort_NearLong_Mid", new PathPlannerAuto("Right_FarShort_NearLong_Mid"));
+    autoChooser.addOption("Right_FarShort_FarLong_Mid", new PathPlannerAuto("Right_FarShort_FarLong_Mid"));
+
+    
 
     autoTab.add("Mode", autoChooser);
     
