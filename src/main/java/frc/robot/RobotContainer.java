@@ -181,6 +181,7 @@ public class RobotContainer {
     uptake.setDefaultCommand(new StopUptake());
     agitator.setDefaultCommand(new StopAgitator());
     intake.setDefaultCommand(new RunIntakeAuto());
+    hood.setDefaultCommand(new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition));
 
     // for pit testing, comment out the hood command below and uncomment the intake command below
     shooter.setDefaultCommand(new ContinuousSetShooter());
@@ -310,10 +311,15 @@ public class RobotContainer {
     public void registerNamedCommands() {
         /* Command registration for PathPlanner */     
         NamedCommands.registerCommand("LowerIntake", new AutoLowerIntake().withTimeout(0.01));
+        NamedCommands.registerCommand("LowerHood", new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition));
         NamedCommands.registerCommand("AutoSetShooterAndHood", new ContinuousSetShooter());
         NamedCommands.registerCommand("AimToShoot", new AimToShootPoseOnly());
         NamedCommands.registerCommand("ShootCommand", (new ShooterAdderCommand(Constants.Shooter.ShooterSpeed.ShooterAdder).withTimeout(0.25).andThen(new ShooterAdderCommand(0))).alongWith(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.squeeze)))));
         NamedCommands.registerCommand("RunIntake", new RunIntake());
-        NamedCommands.registerCommand("StopShoot", new StopUptake().alongWith(new RunIntake()).alongWith(new SlowAgitator().alongWith(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.RunIntakePosition))));
+        NamedCommands.registerCommand("StopShoot", new StopUptake()
+                                                        .alongWith(new RunIntake())
+                                                        .alongWith(new SlowAgitator())
+                                                        .alongWith(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.RunIntakePosition))
+                                                        .alongWith(new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition)));
     }
 }
