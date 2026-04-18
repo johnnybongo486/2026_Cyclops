@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.LimelightHelpers;
+import frc.lib.LimelightHelpers.PoseEstimate;
 import frc.robot.RobotContainer;
 
 public class PoseEst extends SubsystemBase{
@@ -34,7 +35,7 @@ public class PoseEst extends SubsystemBase{
     private Pose2d targetDepotPassPoseBlue = new Pose2d(2,6.5, Rotation2d.fromDegrees(0));
     private Pose2d targetDepotPassPoseRed = new Pose2d(14.5,1.5, Rotation2d.fromDegrees(0));
 
-
+    private Pose2d currentPose = new Pose2d(0,0, Rotation2d.fromDegrees(0));
 
     private double tX = 0;
     private double tY = 0;
@@ -83,6 +84,11 @@ public class PoseEst extends SubsystemBase{
     public void updatePose() {
         // Refresh alliance every loop so it's never stale from pre-FMS-connect startup
         alliance = DriverStation.getAlliance();
+        currentPose = RobotContainer.drivetrain.getState().Pose;
+
+        double currentX = currentPose.getX();
+        double currentY = currentPose.getY();
+
 
         //Send data to LL
         LimelightHelpers.SetRobotOrientation("limelight-right", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
@@ -90,9 +96,12 @@ public class PoseEst extends SubsystemBase{
         LimelightHelpers.SetRobotOrientation("limelight-shooter", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
         
         //Pull relative tag location
+        //LimelightHelpers.PoseEstimate mt2LeftBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
         LimelightHelpers.PoseEstimate mt2LeftBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
         LimelightHelpers.PoseEstimate mt2RightBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
         LimelightHelpers.PoseEstimate mt2ShooterBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shooter");
+
+        
 
         //init rejects
         doRejectUpdateLeft = false; // falses
@@ -101,8 +110,46 @@ public class PoseEst extends SubsystemBase{
 
         if (alliance.isPresent()) {
 
-            if(mt2LeftBlue != null && mt2RightBlue != null && mt2ShooterBlue != null) { // make sure we have the camera        
-                if(Math.abs(RobotContainer.drivetrain.getPigeon2().getAngularVelocityZDevice().getValueAsDouble()) > 720) {// if our angular velocity is greater than 720 degrees per second, ignore vision updates
+            if(mt2LeftBlue != null && mt2RightBlue != null && mt2ShooterBlue != null) { // make sure we have the camera
+                // check for outlier measurements
+                // if((Math.abs(mt2LeftBlue.pose.getX() - currentX) > 2) || (Math.abs(mt2LeftBlue.pose.getY() - currentY) > 2)) {
+                //     doRejectUpdateLeft = true;
+                // }
+
+                // if((Math.abs(mt2RightBlue.pose.getX() - currentX) > 2) || (Math.abs(mt2RightBlue.pose.getY() - currentY) > 2)) {
+                //     doRejectUpdateRight = true;
+                // } 
+
+                // if((Math.abs(mt2ShooterBlue.pose.getX() - currentX) > 2) || (Math.abs(mt2ShooterBlue.pose.getY() - currentY) > 2)) {
+                //     doRejectUpdateShooter = true;
+                // }
+
+                // check for midfield bug
+                if((Math.abs(mt2LeftBlue.pose.getX() - 8.25) < 0.5) && (Math.abs(mt2LeftBlue.pose.getY() - 4.0) < 0.5)) {
+                    doRejectUpdateLeft = true;
+                }
+
+                if((Math.abs(mt2RightBlue.pose.getX() - 8.25) < 0.5) && (Math.abs(mt2RightBlue.pose.getY() - 4.0) < 0.5)) {
+                    doRejectUpdateRight = true;
+                }
+
+                if((Math.abs(mt2ShooterBlue.pose.getX() - 8.25) < 0.5) && (Math.abs(mt2ShooterBlue.pose.getY() - 4.0) < 0.5)) {
+                    doRejectUpdateShooter = true;
+                }
+
+                if(Math.abs(RobotContainer.drivetrain.getPigeon2().getAngularVelocityZDevice().getValueAsDouble()) > 360) {// if our angular velocity is greater than 720 degrees per second, ignore vision updates
+                    doRejectUpdateLeft = true;
+                    doRejectUpdateRight = true;
+                    doRejectUpdateShooter = true;
+                }
+
+                if (Math.abs(RobotContainer.drivetrain.getState().Speeds.vxMetersPerSecond) > 1.5) {
+                    doRejectUpdateLeft = true;
+                    doRejectUpdateRight = true;
+                    doRejectUpdateShooter = true;
+                }
+
+                if (Math.abs(RobotContainer.drivetrain.getState().Speeds.vyMetersPerSecond) > 1.5) {
                     doRejectUpdateLeft = true;
                     doRejectUpdateRight = true;
                     doRejectUpdateShooter = true;
@@ -122,13 +169,13 @@ public class PoseEst extends SubsystemBase{
                     doRejectUpdateShooter = true;
                 }
 
-                if(!doRejectUpdateLeft) {
-                    RobotContainer.drivetrain.addVisionMeasurement(mt2LeftBlue.pose, mt2LeftBlue.timestampSeconds, VecBuilder.fill(RobotContainer.standardDeviation,RobotContainer.standardDeviation,99999)); // n1: 0.7
-                }
+                // if(!doRejectUpdateLeft) {
+                //     RobotContainer.drivetrain.addVisionMeasurement(mt2LeftBlue.pose, mt2LeftBlue.timestampSeconds, VecBuilder.fill(RobotContainer.standardDeviation,RobotContainer.standardDeviation,99999)); // n1: 0.7
+                // }
 
-                if(!doRejectUpdateRight) {
-                    RobotContainer.drivetrain.addVisionMeasurement(mt2RightBlue.pose, mt2RightBlue.timestampSeconds, VecBuilder.fill(RobotContainer.standardDeviation,RobotContainer.standardDeviation,99999)); // n1: 0.7
-                }
+                // if(!doRejectUpdateRight) {
+                //     RobotContainer.drivetrain.addVisionMeasurement(mt2RightBlue.pose, mt2RightBlue.timestampSeconds, VecBuilder.fill(RobotContainer.standardDeviation,RobotContainer.standardDeviation,99999)); // n1: 0.7
+                // }
 
                 if(!doRejectUpdateShooter) {
                     RobotContainer.drivetrain.addVisionMeasurement(mt2ShooterBlue.pose, mt2ShooterBlue.timestampSeconds, VecBuilder.fill(RobotContainer.standardDeviation,RobotContainer.standardDeviation,99999)); // n1: 0.7

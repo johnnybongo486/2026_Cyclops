@@ -95,7 +95,7 @@ public class RobotContainer {
 
   public static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-  public static double standardDeviation = 0.7;
+  public static double standardDeviation = 0.7; // was 0.7
 
   // The robot's subsystems and commands are defined here...
   public static Shooter shooter = new Shooter(); 
@@ -148,29 +148,29 @@ public class RobotContainer {
     */
 
     autoChooser.addOption("Left_Steal_NearShort_Wall", new PathPlannerAuto("Left_StealShort_NearShort_Wall"));
-    autoChooser.addOption("Left_Steal_NearLong_Wall", new PathPlannerAuto("Left_StealShort_NearLong_Wall"));
+    // autoChooser.addOption("Left_Steal_NearLong_Wall", new PathPlannerAuto("Left_StealShort_NearLong_Wall"));
     autoChooser.addOption("Left_Steal_FarLong_Wall", new PathPlannerAuto("Left_StealShort_FarLong_Wall"));
     autoChooser.addOption("Left_Safe_NearShort_Wall", new PathPlannerAuto("Left_FarShort_NearShort_Wall"));
-    autoChooser.addOption("Left_Safe_NearLong_Wall", new PathPlannerAuto("Left_FarShort_NearLong_Wall"));
+    // autoChooser.addOption("Left_Safe_NearLong_Wall", new PathPlannerAuto("Left_FarShort_NearLong_Wall"));
     autoChooser.addOption("Left_Safe_FarLong_Wall", new PathPlannerAuto("Left_FarShort_FarLong_Wall"));
     autoChooser.addOption("Left_Steal_NearShort_Mid", new PathPlannerAuto("Left_StealShort_NearShort_Mid"));
-    autoChooser.addOption("Left_Steal_NearLong_Mid", new PathPlannerAuto("Left_StealShort_NearLong_Mid"));
+    // autoChooser.addOption("Left_Steal_NearLong_Mid", new PathPlannerAuto("Left_StealShort_NearLong_Mid"));
     autoChooser.addOption("Left_Steal_FarLong_Mid", new PathPlannerAuto("Left_StealShort_FarLong_Mid"));
     autoChooser.addOption("Left_Safe_NearShort_Mid", new PathPlannerAuto("Left_FarShort_NearShort_Mid"));
-    autoChooser.addOption("Left_Safe_NearLong_Mid", new PathPlannerAuto("Left_FarShort_NearLong_Mid"));
+    // autoChooser.addOption("Left_Safe_NearLong_Mid", new PathPlannerAuto("Left_FarShort_NearLong_Mid"));
     autoChooser.addOption("Left_Safe_FarLong_Mid", new PathPlannerAuto("Left_FarShort_FarLong_Mid"));
 
     autoChooser.addOption("Right_Steal_NearShort_Wall", new PathPlannerAuto("Right_StealShort_NearShort_Wall"));
-    autoChooser.addOption("Right_Steal_NearLong_Wall", new PathPlannerAuto("Right_StealShort_NearLong_Wall"));
+    // autoChooser.addOption("Right_Steal_NearLong_Wall", new PathPlannerAuto("Right_StealShort_NearLong_Wall"));
     autoChooser.addOption("Right_Steal_FarLong_Wall", new PathPlannerAuto("Right_StealShort_FarLong_Wall"));    
     autoChooser.addOption("Right_Safe_NearShort_Wall", new PathPlannerAuto("Right_FarShort_NearShort_Wall"));
-    autoChooser.addOption("Right_Safe_NearLong_Wall", new PathPlannerAuto("Right_FarShort_NearLong_Wall"));
+    // autoChooser.addOption("Right_Safe_NearLong_Wall", new PathPlannerAuto("Right_FarShort_NearLong_Wall"));
     autoChooser.addOption("Right_Safe_FarLong_Wall", new PathPlannerAuto("Right_FarShort_FarLong_Wall"));
     autoChooser.addOption("Right_Steal_NearShort_Mid", new PathPlannerAuto("Right_StealShort_NearShort_Mid"));
-    autoChooser.addOption("Right_Steal_NearLong_Mid", new PathPlannerAuto("Right_StealShort_NearLong_Mid"));
+    // autoChooser.addOption("Right_Steal_NearLong_Mid", new PathPlannerAuto("Right_StealShort_NearLong_Mid"));
     autoChooser.addOption("Right_Steal_FarLong_Mid", new PathPlannerAuto("Right_StealShort_FarLong_Mid"));    
     autoChooser.addOption("Right_Safe_NearShort_Mid", new PathPlannerAuto("Right_FarShort_NearShort_Mid"));
-    autoChooser.addOption("Right_Safe_NearLong_Mid", new PathPlannerAuto("Right_FarShort_NearLong_Mid"));
+    // autoChooser.addOption("Right_Safe_NearLong_Mid", new PathPlannerAuto("Right_FarShort_NearLong_Mid"));
     autoChooser.addOption("Right_Safe_FarLong_Mid", new PathPlannerAuto("Right_FarShort_FarLong_Mid"));
 
     autoTab.add("Mode", autoChooser);
@@ -315,7 +315,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("ShootCommand", (new ShooterAdderCommand(Constants.Shooter.ShooterSpeed.ShooterAdder).withTimeout(0.25).andThen(new ShooterAdderCommand(0))).alongWith(new RunAgitator().alongWith(new RunIntakeSlow()).alongWith(new RunUptake()).alongWith(new WaitCommand(0.5).andThen(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.squeeze)))));
         NamedCommands.registerCommand("RunIntake", new RunIntake());
         NamedCommands.registerCommand("StopShoot", new StopUptake()
-                                                        .alongWith(new RunIntake())
+                                                        .alongWith(new ReverseIntake().withTimeout(0.5).andThen(new RunIntake()))
                                                         .alongWith(new SlowAgitator())
                                                         .alongWith(new SetIntakeWristPosition(Constants.Intake.IntakeWrist.RunIntakePosition))
                                                         .alongWith(new SetHoodPosition(Constants.Shooter.Hood.StoreHoodPosition)));

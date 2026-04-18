@@ -16,8 +16,8 @@ public class PoseLimelight extends SubsystemBase {
    NetworkTableInstance Inst;
 
    //  Blue Side
-   private double blueLLForwardLeft = -0.127;
-   private double blueLLForwardRight = -0.127;
+   private double blueLLForwardLeft = 0.127;
+   private double blueLLForwardRight = 0.127;
    private double blueLLForwardShooter = 0.28575;
 
    private double blueLLRightLeft = -0.3302;
@@ -41,8 +41,8 @@ public class PoseLimelight extends SubsystemBase {
    private double blueLLYawShooter = 0;
 
    // Red Side
-   private double redLLForwardLeft = 0.127;
-   private double redLLForwardRight = 0.127;
+   private double redLLForwardLeft = -0.127;
+   private double redLLForwardRight = -0.127;
    private double redLLForwardShooter = -0.28575;
 
    private double redLLRightLeft = 0.3302;
