@@ -98,7 +98,7 @@ public class PoseEst extends SubsystemBase{
         //Pull relative tag location
         //LimelightHelpers.PoseEstimate mt2LeftBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
         LimelightHelpers.PoseEstimate mt2LeftBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
-        LimelightHelpers.PoseEstimate mt2RightBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
+        //LimelightHelpers.PoseEstimate mt2RightBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
         LimelightHelpers.PoseEstimate mt2ShooterBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shooter");
 
         
@@ -110,7 +110,7 @@ public class PoseEst extends SubsystemBase{
 
         if (alliance.isPresent()) {
 
-            if(mt2LeftBlue != null && mt2RightBlue != null && mt2ShooterBlue != null) { // make sure we have the camera
+            if(mt2LeftBlue != null && mt2ShooterBlue != null) { // make sure we have the camera
                 // check for outlier measurements
                 // if((Math.abs(mt2LeftBlue.pose.getX() - currentX) > 2) || (Math.abs(mt2LeftBlue.pose.getY() - currentY) > 2)) {
                 //     doRejectUpdateLeft = true;
@@ -129,9 +129,9 @@ public class PoseEst extends SubsystemBase{
                     doRejectUpdateLeft = true;
                 }
 
-                if((Math.abs(mt2RightBlue.pose.getX() - 8.25) < 0.5) && (Math.abs(mt2RightBlue.pose.getY() - 4.0) < 0.5)) {
-                    doRejectUpdateRight = true;
-                }
+                //if((Math.abs(mt2RightBlue.pose.getX() - 8.25) < 0.5) && (Math.abs(mt2RightBlue.pose.getY() - 4.0) < 0.5)) {
+                //    doRejectUpdateRight = true;
+                //}
 
                 if((Math.abs(mt2ShooterBlue.pose.getX() - 8.25) < 0.5) && (Math.abs(mt2ShooterBlue.pose.getY() - 4.0) < 0.5)) {
                     doRejectUpdateShooter = true;
@@ -160,9 +160,9 @@ public class PoseEst extends SubsystemBase{
                 }
 
 
-                if(mt2RightBlue.tagCount == 0) {
-                    doRejectUpdateRight = true;
-                }
+                //if(mt2RightBlue.tagCount == 0) {
+                //    doRejectUpdateRight = true;
+                //}
 
 
                 if(mt2ShooterBlue.tagCount == 0) {
