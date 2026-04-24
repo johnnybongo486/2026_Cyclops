@@ -11,7 +11,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DCMPDoubleShotLeftSafe1"
+                  "pathName": "LeftStart_FarShort"
                 }
               },
               {
@@ -106,7 +106,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DCMPShortDoubleShotLeftSteal2"
+                  "pathName": "LeftSecond_NearLong"
                 }
               },
               {
@@ -169,7 +169,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "DCMPLeftTrenchExit"
+                  "pathName": "LeftExitWall"
                 }
               },
               {

@@ -51,7 +51,7 @@ public final class Constants {
       public static double a = 0.31429744138369126;
       public static double b = 0.99819972029013271;
       public static double c = 37.404054363263093;  // 37.404054363263093
-      public static double ShooterAdder = 3.0;
+      public static double ShooterAdder = 2.25;
     }
     public static class ShooterPassing {
       public static double a = 0.083255767043861117;
