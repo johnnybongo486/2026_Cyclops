@@ -76,6 +76,9 @@ public class PoseEst extends SubsystemBase{
     private double leftDistToRobot = -1.0;
     private double shooterDistToRobot = -1.0;
 
+    private double rightTagCount = 0;
+    private double rightLength = 0;
+
     // Refreshed each loop in updatePose() — do not cache at construction time since FMS
     // may not have set the alliance yet when robot code first starts.
     public Optional<Alliance> alliance = Optional.empty();
@@ -98,6 +101,14 @@ public class PoseEst extends SubsystemBase{
         standardDeviationShooter = RobotContainer.standardDeviationShooter;
         standardDeviationRight = RobotContainer.standardDeviationRight;
 
+        rightAmbiguity = -1.0;
+        leftAmbiguity = -1.0;
+        shooterAmbiguity = -1.0;
+
+        rightDistToRobot = -1.0;
+        leftDistToRobot = -1.0;
+        shooterDistToRobot = -1.0;
+
         // Send data to LL
         LimelightHelpers.SetRobotOrientation("limelight-left", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
         LimelightHelpers.SetRobotOrientation("limelight-shooter", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
@@ -108,13 +119,13 @@ public class PoseEst extends SubsystemBase{
         LimelightHelpers.PoseEstimate mt2ShooterBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shooter");
         LimelightHelpers.PoseEstimate mt2RightBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
         
-        leftAmbiguity = mt2LeftBlue.rawFiducials[0].ambiguity;
-        shooterAmbiguity = mt2ShooterBlue.rawFiducials[0].ambiguity;
-        rightAmbiguity = mt2RightBlue.rawFiducials[0].ambiguity;
+        //leftAmbiguity = mt2LeftBlue.rawFiducials[0].ambiguity;
+        //shooterAmbiguity = mt2ShooterBlue.rawFiducials[0].ambiguity;
+        //rightAmbiguity = mt2RightBlue.rawFiducials[0].ambiguity;
 
-        leftDistToRobot = mt2LeftBlue.rawFiducials[0].distToRobot;
-        shooterDistToRobot = mt2ShooterBlue.rawFiducials[0].distToRobot;
-        rightDistToRobot = mt2RightBlue.rawFiducials[0].distToRobot;
+        //leftDistToRobot = mt2LeftBlue.rawFiducials[0].distToRobot;
+        //shooterDistToRobot = mt2ShooterBlue.rawFiducials[0].distToRobot;
+        //rightDistToRobot = mt2RightBlue.rawFiducials[0].distToRobot;
 
         // Init rejects
         doRejectUpdateLeft = false;
@@ -152,6 +163,8 @@ public class PoseEst extends SubsystemBase{
 
                 // Check for ambiguity and distance for single tags
                 else if (mt2LeftBlue.tagCount == 1 && mt2LeftBlue.rawFiducials.length == 1) {
+                    leftAmbiguity = mt2LeftBlue.rawFiducials[0].ambiguity;
+                    leftDistToRobot = mt2LeftBlue.rawFiducials[0].distToRobot;
                     if (mt2LeftBlue.rawFiducials[0].ambiguity > 0.5) {
                         doRejectUpdateLeft = true;
                     }
@@ -172,7 +185,15 @@ public class PoseEst extends SubsystemBase{
                 }
 
                 else if (mt2LeftBlue.tagCount >= 2) {
-                    standardDeviationLeft = standardDeviationLeft / 10;  //TODO
+                    standardDeviationLeft = standardDeviationLeft / 5;  //TODO
+
+                    if (mt2LeftBlue.rawFiducials[0].distToRobot > 1) {
+                        standardDeviationLeft = standardDeviationLeft * mt2LeftBlue.rawFiducials[0].distToRobot; 
+                    }
+                    
+                    else {
+
+                    }
                 }
 
                 else {
@@ -217,6 +238,8 @@ public class PoseEst extends SubsystemBase{
 
                 // Check for abigutiy and distance for single tags
                 else if (mt2ShooterBlue.tagCount == 1 && mt2ShooterBlue.rawFiducials.length == 1) {
+                    shooterAmbiguity = mt2ShooterBlue.rawFiducials[0].ambiguity;
+                    shooterDistToRobot = mt2ShooterBlue.rawFiducials[0].distToRobot;
                     if (mt2ShooterBlue.rawFiducials[0].ambiguity > 0.5){
                         doRejectUpdateShooter = true;
                     }
@@ -237,7 +260,13 @@ public class PoseEst extends SubsystemBase{
                 }
 
                 else if (mt2ShooterBlue.tagCount >= 2) {
-                    standardDeviationShooter = standardDeviationShooter / 10;  //TODO
+                    standardDeviationShooter = standardDeviationShooter / 5;  //TODO
+                    if (mt2ShooterBlue.rawFiducials[0].distToRobot > 1) {
+                        standardDeviationShooter = standardDeviationShooter * mt2ShooterBlue.rawFiducials[0].distToRobot; 
+                    }
+                    else {
+
+                    }
                 }
 
                 else {
@@ -257,6 +286,8 @@ public class PoseEst extends SubsystemBase{
             // Right Pose Checks
 
             if (mt2RightBlue != null){
+                rightTagCount = mt2RightBlue.tagCount;
+                rightLength = mt2RightBlue.rawFiducials.length;
 
                 // Is it in the bad spot? 
                 // If the cmaera want us to be at the center of the field, reject it
@@ -283,6 +314,8 @@ public class PoseEst extends SubsystemBase{
 
                 // Check for abigutiy and distance for single tags DB
                 else if (mt2RightBlue.tagCount == 1 && mt2RightBlue.rawFiducials.length == 1) {
+                    rightAmbiguity = mt2RightBlue.rawFiducials[0].ambiguity;
+                    rightDistToRobot = mt2RightBlue.rawFiducials[0].distToRobot;
                     if (mt2RightBlue.rawFiducials[0].ambiguity > 0.5){
                         doRejectUpdateRight = true;
                     }
@@ -303,7 +336,13 @@ public class PoseEst extends SubsystemBase{
                 }
 
                 else if (mt2RightBlue.tagCount >= 2) {
-                    standardDeviationRight = standardDeviationRight / 10;  //TODO
+                    standardDeviationRight = standardDeviationRight / 5;  //TODO
+                    if (mt2RightBlue.rawFiducials[0].distToRobot > 1) { //DB
+                        standardDeviationRight = standardDeviationRight * mt2RightBlue.rawFiducials[0].distToRobot; 
+                    }
+                    else {
+
+                    }
                 }
 
                 else {
@@ -656,6 +695,8 @@ public class PoseEst extends SubsystemBase{
         SmartDashboard.putNumber("mt2LeftBlueDistance", leftDistToRobot);
         SmartDashboard.putNumber("mt2ShooterBlueAmbiguity", shooterAmbiguity);
         SmartDashboard.putNumber("mt2ShooterBlueDistance", shooterDistToRobot);
+        SmartDashboard.putNumber("mt2RightBlueTagCoutn", rightTagCount);
+        SmartDashboard.putNumber("mt2RightBlueLenth", rightLength);
     
     }
 }

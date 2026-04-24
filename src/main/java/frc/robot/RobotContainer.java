@@ -96,9 +96,9 @@ public class RobotContainer {
 
   public static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-  public static double standardDeviationLeft = 0.1;
+  public static double standardDeviationLeft = 0.5;
   public static double standardDeviationShooter = 0.1;
-  public static double standardDeviationRight = 0.1;
+  public static double standardDeviationRight = 0.5;
 
   // The robot's subsystems and commands are defined here...
   public static Shooter shooter = new Shooter(); 

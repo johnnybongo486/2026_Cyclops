@@ -20,8 +20,8 @@ public class PoseLimelight extends SubsystemBase {
    private double blueLLForwardRight = 0.127;
    private double blueLLForwardShooter = 0.28575;
 
-   private double blueLLRightLeft = -0.3302;
-   private double blueLLRightRight = 0.3302;
+   private double blueLLRightLeft = -0.4802;  // -0.3302
+   private double blueLLRightRight = 0.4802; // 0.3302
    private double blueLLRightShooter = 0;
 
    private double blueLLUpLeft = 0.1556;
@@ -45,8 +45,8 @@ public class PoseLimelight extends SubsystemBase {
    private double redLLForwardRight = -0.127;
    private double redLLForwardShooter = -0.28575;
 
-   private double redLLRightLeft = 0.3302;
-   private double redLLRightRight = -0.3302;
+   private double redLLRightLeft = 0.4802;  // 0.3302
+   private double redLLRightRight = -0.4802;  //-0.3302
    private double redLLRightShooter = 0;
 
    private double redLLUpLeft = 0.1556;
