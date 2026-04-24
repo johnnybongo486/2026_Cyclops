@@ -13,12 +13,19 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.LimelightHelpers;
-import frc.lib.LimelightHelpers.PoseEstimate;
+import frc.lib.LimelightHelpers.RawFiducial;
 import frc.robot.RobotContainer;
 
 public class PoseEst extends SubsystemBase{
 
+
+    public boolean doRejectUpdateLeft = false;
     public boolean doRejectUpdateShooter = false;
+    public boolean doRejectUpdateRight = false;
+
+    private double standardDeviationLeft = RobotContainer.standardDeviationLeft;
+    private double standardDeviationShooter = RobotContainer.standardDeviationShooter;
+    private double standardDeviationRight = RobotContainer.standardDeviationRight;
 
     public boolean isPresent = false;
     private double theta = 0.0;
@@ -39,10 +46,8 @@ public class PoseEst extends SubsystemBase{
     private double tY = 0;
     private double xH = 0;
     private double yH = 0;
-    private double prevHoodPos = 0;
 
     private boolean passingMode = true;
-    private boolean isSafe = true;
     private boolean isSafeIntake = true;
     private GenericEntry startingPose;
     private boolean isShooting = false;
@@ -57,14 +62,19 @@ public class PoseEst extends SubsystemBase{
     private double time;
     private double timeLeft;
     private boolean rejectLL;
-    private double safeMinR;
-    private double safeMaxR;
-    private double safeMinB;
-    private double safeMaxB;
+
     private double safeMinIntakeR;
     private double safeMaxIntakeR;
     private double safeMinIntakeB;
     private double safeMaxIntakeB;
+
+    private double rightAmbiguity = -1.0;
+    private double leftAmbiguity = -1.0;
+    private double shooterAmbiguity = -1.0;
+
+    private double rightDistToRobot = -1.0;
+    private double leftDistToRobot = -1.0;
+    private double shooterDistToRobot = -1.0;
 
     // Refreshed each loop in updatePose() — do not cache at construction time since FMS
     // may not have set the alliance yet when robot code first starts.
@@ -82,57 +92,237 @@ public class PoseEst extends SubsystemBase{
     public void updatePose() {
         // Refresh alliance every loop so it's never stale from pre-FMS-connect startup
         alliance = DriverStation.getAlliance();
-        currentPose = RobotContainer.drivetrain.getState().Pose;
 
-        double currentX = currentPose.getX();
-        double currentY = currentPose.getY();
+        // Set initial standard deviation DB0
+        standardDeviationLeft = RobotContainer.standardDeviationLeft;
+        standardDeviationShooter = RobotContainer.standardDeviationShooter;
+        standardDeviationRight = RobotContainer.standardDeviationRight;
 
-        //Send data to LL
+        // Send data to LL
+        LimelightHelpers.SetRobotOrientation("limelight-left", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
         LimelightHelpers.SetRobotOrientation("limelight-shooter", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
-        
-        //Pull relative tag location
+        LimelightHelpers.SetRobotOrientation("limelight-right", RobotContainer.drivetrain.getPigeon2().getYaw().getValueAsDouble(), 0, 0, 0, 0, 0);
+ 
+        // Pull relative tag location
+        LimelightHelpers.PoseEstimate mt2LeftBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-left");
         LimelightHelpers.PoseEstimate mt2ShooterBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-shooter");
+        LimelightHelpers.PoseEstimate mt2RightBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2("limelight-right");
+        
+        leftAmbiguity = mt2LeftBlue.rawFiducials[0].ambiguity;
+        shooterAmbiguity = mt2ShooterBlue.rawFiducials[0].ambiguity;
+        rightAmbiguity = mt2RightBlue.rawFiducials[0].ambiguity;
 
-        //init rejects
+        leftDistToRobot = mt2LeftBlue.rawFiducials[0].distToRobot;
+        shooterDistToRobot = mt2ShooterBlue.rawFiducials[0].distToRobot;
+        rightDistToRobot = mt2RightBlue.rawFiducials[0].distToRobot;
+
+        // Init rejects
+        doRejectUpdateLeft = false;
         doRejectUpdateShooter = false;
+        doRejectUpdateRight = false;
 
+        // Do we have connection to alliance?
         if (alliance.isPresent()) {
+           
+            // Left Pose Checks
+            if (mt2LeftBlue != null){
 
-            if(mt2ShooterBlue != null) { // make sure we have the camera
+                // Is it in the bad spot?
+                // If the cmaera want us to be at the center of the field, reject it
+                // Or if the camera wants us to be at 0,0, reject it
+                if(((Math.abs(mt2LeftBlue.pose.getX() - 8.25) < 0.5) && (Math.abs(mt2LeftBlue.pose.getY() - 4.0) < 0.5)) ||
+                (mt2LeftBlue.pose.getX() == 0 && mt2LeftBlue.pose.getY() == 0)) {
+                    doRejectUpdateLeft = true;
+                }
 
-                // check for midfield bug
-                if((Math.abs(mt2ShooterBlue.pose.getX() - 8.25) < 0.5) && (Math.abs(mt2ShooterBlue.pose.getY() - 4.0) < 0.5)) {
+                // Are we rotating too quickly?
+                if(Math.abs(RobotContainer.drivetrain.getPigeon2().getAngularVelocityZDevice().getValueAsDouble()) > 720) {
+                    standardDeviationLeft = standardDeviationLeft * 10;
+                }
+
+                // Are we driving fast?  If so, set to 1.0
+                if (Math.abs(RobotContainer.drivetrain.getState().Speeds.vxMetersPerSecond) > 2 || Math.abs(RobotContainer.drivetrain.getState().Speeds.vyMetersPerSecond) > 2) {
+                    standardDeviationLeft = standardDeviationLeft * 10;
+                }
+
+                // How many tags can we see?
+                if(mt2LeftBlue.tagCount == 0) {
+                    doRejectUpdateLeft = true;
+                }
+
+                // Check for ambiguity and distance for single tags
+                else if (mt2LeftBlue.tagCount == 1 && mt2LeftBlue.rawFiducials.length == 1) {
+                    if (mt2LeftBlue.rawFiducials[0].ambiguity > 0.5) {
+                        doRejectUpdateLeft = true;
+                    }
+
+                    else if (mt2LeftBlue.rawFiducials[0].ambiguity <= 0.5) {
+                        if (mt2LeftBlue.rawFiducials[0].distToRobot > 1) {
+                            standardDeviationLeft = standardDeviationLeft * mt2LeftBlue.rawFiducials[0].distToRobot; 
+                        }
+                        else {
+
+                        }
+                    }
+
+                    else {
+
+                    }
+
+                }
+
+                else if (mt2LeftBlue.tagCount >= 2) {
+                    standardDeviationLeft = standardDeviationLeft / 10;  //TODO
+                }
+
+                else {
+
+                }
+
+                // Send pose data
+                if(!doRejectUpdateLeft) {
+                    RobotContainer.drivetrain.addVisionMeasurement(mt2LeftBlue.pose, mt2LeftBlue.timestampSeconds, VecBuilder.fill(standardDeviationLeft, standardDeviationLeft, 99999));
+                } 
+            }
+
+            else{
+                System.out.println("PoseEst.java: mt2LeftBlue is null");
+            }
+            
+             // Shooter Pose Checks
+            if (mt2ShooterBlue != null){
+
+                // Is it in the bad spot?
+                // If the cmaera want us to be at the center of the field, reject it
+                // Or if the camera wants us to be at 0,0, reject it
+                if(((Math.abs(mt2ShooterBlue.pose.getX() - 8.25) < 0.5) && (Math.abs(mt2ShooterBlue.pose.getY() - 4.0) < 0.5)) ||
+                (mt2ShooterBlue.pose.getX() == 0 && mt2ShooterBlue.pose.getY() == 0)) {
                     doRejectUpdateShooter = true;
                 }
 
-                if(Math.abs(RobotContainer.drivetrain.getPigeon2().getAngularVelocityZDevice().getValueAsDouble()) > 360) {// if our angular velocity is greater than 720 degrees per second, ignore vision updates
-                    doRejectUpdateShooter = true;
+                // Are we rotating too quickly?
+                if(Math.abs(RobotContainer.drivetrain.getPigeon2().getAngularVelocityZDevice().getValueAsDouble()) > 720) {
+                    standardDeviationShooter = standardDeviationShooter * 10;  // TODO
                 }
 
-                if (Math.abs(RobotContainer.drivetrain.getState().Speeds.vxMetersPerSecond) > 1.5) {
-                    doRejectUpdateShooter = true;
+                // Are we driving fast?
+                if (Math.abs(RobotContainer.drivetrain.getState().Speeds.vxMetersPerSecond) > 2 || Math.abs(RobotContainer.drivetrain.getState().Speeds.vyMetersPerSecond) > 2) {
+                    standardDeviationShooter = standardDeviationShooter * 10;  // TODO
                 }
 
-                if (Math.abs(RobotContainer.drivetrain.getState().Speeds.vyMetersPerSecond) > 1.5) {
-                    doRejectUpdateShooter = true;
-                }
-
+                // How many tags can we see?
                 if(mt2ShooterBlue.tagCount == 0) {
                     doRejectUpdateShooter = true;
                 }
 
-                if(!doRejectUpdateShooter) {
-                    RobotContainer.drivetrain.addVisionMeasurement(mt2ShooterBlue.pose, mt2ShooterBlue.timestampSeconds, VecBuilder.fill(RobotContainer.standardDeviation,RobotContainer.standardDeviation,99999)); // n1: 0.7
+                // Check for abigutiy and distance for single tags
+                else if (mt2ShooterBlue.tagCount == 1 && mt2ShooterBlue.rawFiducials.length == 1) {
+                    if (mt2ShooterBlue.rawFiducials[0].ambiguity > 0.5){
+                        doRejectUpdateShooter = true;
+                    }
+
+                    else if (mt2ShooterBlue.rawFiducials[0].ambiguity <= 0.5) {
+                        if (mt2ShooterBlue.rawFiducials[0].distToRobot > 1) {
+                            standardDeviationShooter = standardDeviationShooter * mt2ShooterBlue.rawFiducials[0].distToRobot; 
+                        }
+                        else {
+
+                        }
+                    }
+
+                    else {
+
+                    }
+
                 }
-            } 
-            
-            else {
+
+                else if (mt2ShooterBlue.tagCount >= 2) {
+                    standardDeviationShooter = standardDeviationShooter / 10;  //TODO
+                }
+
+                else {
+
+                }
+
+                // Send pose data
+                if(!doRejectUpdateShooter) {
+                    RobotContainer.drivetrain.addVisionMeasurement(mt2ShooterBlue.pose, mt2ShooterBlue.timestampSeconds, VecBuilder.fill(standardDeviationShooter, standardDeviationShooter, 99999));
+                } 
+            }
+
+            else{
                 System.out.println("PoseEst.java: mt2ShooterBlue is null");
-            }  
+            }
+
+            // Right Pose Checks
+
+            if (mt2RightBlue != null){
+
+                // Is it in the bad spot? 
+                // If the cmaera want us to be at the center of the field, reject it
+                // Or if the camera wants us to be at 0,0, reject it
+                if(((Math.abs(mt2RightBlue.pose.getX() - 8.25) < 0.5) && (Math.abs(mt2RightBlue.pose.getY() - 4.0) < 0.5)) ||
+                (mt2RightBlue.pose.getX() == 0 && mt2RightBlue.pose.getY() == 0)) {
+                    doRejectUpdateRight = true;
+                }
+
+                // Are we rotating too quickly?
+                if(Math.abs(RobotContainer.drivetrain.getPigeon2().getAngularVelocityZDevice().getValueAsDouble()) > 720) {
+                    standardDeviationRight = standardDeviationRight * 10;  // TODO
+                }
+
+                // Are we driving fast?
+                if (Math.abs(RobotContainer.drivetrain.getState().Speeds.vxMetersPerSecond) > 2 || Math.abs(RobotContainer.drivetrain.getState().Speeds.vyMetersPerSecond) > 2) {
+                    standardDeviationRight = standardDeviationRight * 10;  // TODO
+                }
+
+                // How many tags can we see?
+                if(mt2RightBlue.tagCount == 0) {
+                    doRejectUpdateRight = true;
+                }
+
+                // Check for abigutiy and distance for single tags DB
+                else if (mt2RightBlue.tagCount == 1 && mt2RightBlue.rawFiducials.length == 1) {
+                    if (mt2RightBlue.rawFiducials[0].ambiguity > 0.5){
+                        doRejectUpdateRight = true;
+                    }
+
+                    else if (mt2RightBlue.rawFiducials[0].ambiguity <= 0.5) { //DB
+                        if (mt2RightBlue.rawFiducials[0].distToRobot > 1) { //DB
+                            standardDeviationRight = standardDeviationRight * mt2RightBlue.rawFiducials[0].distToRobot; 
+                        }
+                        else {
+
+                        }
+                    }
+
+                    else {
+
+                    }
+
+                }
+
+                else if (mt2RightBlue.tagCount >= 2) {
+                    standardDeviationRight = standardDeviationRight / 10;  //TODO
+                }
+
+                else {
+
+                }
+
+                // Send pose data
+                if(!doRejectUpdateRight) {
+                    RobotContainer.drivetrain.addVisionMeasurement(mt2RightBlue.pose, mt2RightBlue.timestampSeconds, VecBuilder.fill(standardDeviationRight, standardDeviationRight, 99999));
+                } 
+            }
+
+            else{
+                System.out.println("PoseEst.java: mt2RightBlue is null");
+            }
         }
 
-        else{
-            
+        else {
+            System.out.println("PoseEst.java: alliance is null");
         }
     }  
     
@@ -248,76 +438,43 @@ public class PoseEst extends SubsystemBase{
         Pose2d currentPose = RobotContainer.drivetrain.getState().Pose;
         double currentVelocity = RobotContainer.drivetrain.getXSpeed();
 
-        if (DriverStation.getAlliance().isPresent() == true) {
-
-            //if (alliance.get() == Alliance.Red) {
-                
-                // Check current velocity and set safe zone
-                if (Math.abs(currentVelocity) > 1) {
-                    safeMinIntakeR = 11.1;
-                    safeMaxIntakeR = 12.5;
-                    safeMinIntakeB = 4.0;
-                    safeMaxIntakeB = 5.3;
-                }
-
-                else if (Math.abs(currentVelocity) >= 0 && Math.abs(currentVelocity) <= 1 ) {
-                    safeMinIntakeR = 11.89;
-                    safeMaxIntakeR = 11.9;
-                    safeMinIntakeB = 4.79;
-                    safeMaxIntakeB = 4.8;
-                }
-
-                else {
-
-                }
-
-                // Set Min Max based on velocity
-                if (currentPose.getX() >= safeMinIntakeR && currentPose.getX() <= safeMaxIntakeR) {
-                    isSafeIntake = false;
-                }
-
-                else if (currentPose.getX() >= safeMinIntakeB && currentPose.getX() <= safeMaxIntakeB) {
-                    isSafeIntake = false;
-                }
-
-
-                else {
-                    if(isSafeIntake == false) {
-
-                    }
-
-                    isSafeIntake = true;
-                }
-            /*} 
-            else {
-                // Check current velocity and set safe zone
-                if (Math.abs(currentVelocity) > 2) {
-                    safeMinIntakeB = 4.0;
-                    safeMaxIntakeB = 5.3;
-                }
-
-                else if (Math.abs(currentVelocity) >= 0 && Math.abs(currentVelocity) <= 2 ) {
-                    safeMinIntakeB = 4.79;
-                    safeMaxIntakeB = 4.8;
-                }
-
-                else{
-
-                }
-
-                // Set Min Max based on velocity
-                if (currentPose.getX() >= safeMinIntakeB && currentPose.getX() <= safeMaxIntakeB) { 
-                    isSafeIntake = false;
-                }
-                else {
-                    if(isSafeIntake == false) {
-
-                    }
-
-                    isSafeIntake = true;
-                } 
+        if (DriverStation.getAlliance().isPresent() == true) {                
+            // Check current velocity and set safe zone
+            if (Math.abs(currentVelocity) > 1) {
+                safeMinIntakeR = 11.1;
+                safeMaxIntakeR = 12.5;
+                safeMinIntakeB = 4.0;
+                safeMaxIntakeB = 5.3;
             }
-*/
+
+            else if (Math.abs(currentVelocity) >= 0 && Math.abs(currentVelocity) <= 1 ) {
+                safeMinIntakeR = 11.89;
+                safeMaxIntakeR = 11.9;
+                safeMinIntakeB = 4.79;
+                safeMaxIntakeB = 4.8;
+            }
+
+            else {
+
+            }
+
+            // Set Min Max based on velocity
+            if (currentPose.getX() >= safeMinIntakeR && currentPose.getX() <= safeMaxIntakeR) {
+                isSafeIntake = false;
+            }
+
+            else if (currentPose.getX() >= safeMinIntakeB && currentPose.getX() <= safeMaxIntakeB) {
+                isSafeIntake = false;
+            }
+
+
+            else {
+                if(isSafeIntake == false) {
+
+                }
+
+                isSafeIntake = true;
+            }
             
             return isSafeIntake;   
         }
@@ -490,6 +647,15 @@ public class PoseEst extends SubsystemBase{
         SmartDashboard.putString("Match Timing", timing);
         SmartDashboard.putNumber("TimeLeft", countdown());
         SmartDashboard.putBoolean("REJECT LL", rejectLL);
-        SmartDashboard.putNumber("StandardDeviation", RobotContainer.standardDeviation);
+        SmartDashboard.putNumber("StandardDeviationShooter", standardDeviationShooter);
+        SmartDashboard.putNumber("StandardDeviationLeft", standardDeviationLeft);
+        SmartDashboard.putNumber("StandardDeviationRight", standardDeviationRight);
+        SmartDashboard.putNumber("mt2RightBlueAmbiguity", rightAmbiguity);
+        SmartDashboard.putNumber("mt2RightBlueDistance", rightDistToRobot);
+        SmartDashboard.putNumber("mt2LeftBlueAmbiguity", leftAmbiguity);
+        SmartDashboard.putNumber("mt2LeftBlueDistance", leftDistToRobot);
+        SmartDashboard.putNumber("mt2ShooterBlueAmbiguity", shooterAmbiguity);
+        SmartDashboard.putNumber("mt2ShooterBlueDistance", shooterDistToRobot);
+    
     }
 }

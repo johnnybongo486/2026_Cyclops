@@ -32,6 +32,7 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.IntakeWrist;
 import frc.robot.subsystems.PoseEst;
 import frc.robot.subsystems.PoseLimelight;
+import edu.wpi.first.networktables.BooleanArrayEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -95,7 +96,9 @@ public class RobotContainer {
 
   public static CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-  public static double standardDeviation = 0.7; // was 0.7
+  public static double standardDeviationLeft = 0.1;
+  public static double standardDeviationShooter = 0.1;
+  public static double standardDeviationRight = 0.1;
 
   // The robot's subsystems and commands are defined here...
   public static Shooter shooter = new Shooter(); 

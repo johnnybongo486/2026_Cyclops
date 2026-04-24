@@ -103,7 +103,10 @@ public class Robot extends TimedRobot {
     // use only for practice
     //RobotContainer.drivetrain.seedFieldCentric(Rotation2d.kZero);
 
-    RobotContainer.standardDeviation = 0.1;
+    RobotContainer.standardDeviationLeft = 0.1;
+    RobotContainer.standardDeviationShooter = 0.1;
+    RobotContainer.standardDeviationRight = 0.1;
+
   }
 
   /** This function is called periodically during operator control. */
