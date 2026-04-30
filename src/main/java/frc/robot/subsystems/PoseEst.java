@@ -34,11 +34,11 @@ public class PoseEst extends SubsystemBase{
     private Pose2d targetHubPoseRed = new Pose2d(11.901424,4.021328, Rotation2d.fromDegrees(0));
     private Pose2d targetHubPoseBlue = new Pose2d(4.611624,4.021328, Rotation2d.fromDegrees(0));
 
-    private Pose2d targetHPSPassPoseBlue = new Pose2d(2,1.5, Rotation2d.fromDegrees(0));
-    private Pose2d targetHPSPassPoseRed = new Pose2d(14.5,6.5, Rotation2d.fromDegrees(0));
+    private Pose2d targetHPSPassPoseBlue = new Pose2d(2,2.5, Rotation2d.fromDegrees(0));
+    private Pose2d targetHPSPassPoseRed = new Pose2d(14.5,5.5, Rotation2d.fromDegrees(0));
 
-    private Pose2d targetDepotPassPoseBlue = new Pose2d(2,6.5, Rotation2d.fromDegrees(0));
-    private Pose2d targetDepotPassPoseRed = new Pose2d(14.5,1.5, Rotation2d.fromDegrees(0));
+    private Pose2d targetDepotPassPoseBlue = new Pose2d(2,5.5, Rotation2d.fromDegrees(0));
+    private Pose2d targetDepotPassPoseRed = new Pose2d(14.5,2.5, Rotation2d.fromDegrees(0));
 
     private Pose2d currentPose = new Pose2d(0,0, Rotation2d.fromDegrees(0));
 
