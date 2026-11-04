@@ -185,7 +185,7 @@ public class PoseEst extends SubsystemBase{
                 }
 
                 else if (mt2LeftBlue.tagCount >= 2) {
-                    standardDeviationLeft = standardDeviationLeft / 5;  //TODO
+                    standardDeviationLeft = standardDeviationLeft / 1;  //TODO Taking the divider away 5
 
                     if (mt2LeftBlue.rawFiducials[0].distToRobot > 1) {
                         standardDeviationLeft = standardDeviationLeft * mt2LeftBlue.rawFiducials[0].distToRobot; 
@@ -336,7 +336,7 @@ public class PoseEst extends SubsystemBase{
                 }
 
                 else if (mt2RightBlue.tagCount >= 2) {
-                    standardDeviationRight = standardDeviationRight / 5;  //TODO
+                    standardDeviationRight = standardDeviationRight / 1 ;  //TODO  Changed from 5 to 1
                     if (mt2RightBlue.rawFiducials[0].distToRobot > 1) { //DB
                         standardDeviationRight = standardDeviationRight * mt2RightBlue.rawFiducials[0].distToRobot; 
                     }
